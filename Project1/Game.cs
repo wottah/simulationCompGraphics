@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
@@ -81,22 +82,27 @@ namespace Project1
 			// Write frames if necessary.
 			if (dump_frames)
 			{
-		//const int FRAME_INTERVAL = 4;
-		//if ((frame_number % FRAME_INTERVAL) == 0) {
-		//	const unsigned int w = glutGet(GLUT_WINDOW_WIDTH);
-		//	const unsigned int h = glutGet(GLUT_WINDOW_HEIGHT);
-		//	unsigned char * buffer = (unsigned char *) malloc(w * h * 4 * sizeof(unsigned char));
-		//	if (!buffer)
-		//		exit(-1);
-		//	// glRasterPos2i(0, 0);
-		//	glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-		//	static char filename[80];
-		//	sprintf(filename, "snapshots/img%.5i.png", frame_number / FRAME_INTERVAL);
-		//	printf("Dumped %s.\n", filename);
-		//	saveImageRGBA(filename, buffer, w, h);
-			
-		//	free(buffer);
-		//}
+				const int FrameInterval = 4;
+				if((frame_number % FrameInterval) == 0)
+				{
+					using(Bitmap bmp = new Bitmap(Width, Height))
+					{
+						System.Drawing.Imaging.BitmapData data =
+							bmp.LockBits(this.ClientRectangle, System.Drawing.Imaging.ImageLockMode.WriteOnly,
+										 System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+						GL.ReadPixels(0, 0, Width, Height, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
+						bmp.UnlockBits(data);
+
+						bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+
+						if (!Directory.Exists("snapshots"))
+							Directory.CreateDirectory("snapshots");
+
+						string filename = string.Format("snapshots/img{0}.png", Convert.ToSingle(frame_number)/FrameInterval);
+						bmp.Save(filename);
+						Console.Out.WriteLine("Output snapshot: {0}", Convert.ToSingle(frame_number) / FrameInterval);
+					}
+				}
 			}
 			frame_number++;
 
