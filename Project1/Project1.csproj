@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircularWireConstraint.cs" />
-    <Compile Include="Extends.cs" />
+    <Compile Include="GLMath2.cs" />
     <Compile Include="IForce.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GravityForce.cs" />
