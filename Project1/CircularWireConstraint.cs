@@ -7,13 +7,13 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Project1
 {
-	class CircularWireConstraint
+	class CircularWireConstraint: IDrawableConstraint
 	{
 		private readonly Particle _p;
 		private readonly HyperPoint<float> _center;
-		private readonly double _radius;
+		private readonly float _radius;
 
-		public CircularWireConstraint(Particle p, HyperPoint<float> center, double radius)
+		public CircularWireConstraint(Particle p, HyperPoint<float> center, float radius)
 		{
 			_p = p;
 			_center = center;
@@ -31,5 +31,35 @@ namespace Project1
 			}
 			GL.End();
 		}
+
+		#region Implementation of IConstraint
+
+		/// <summary>
+		/// Calculate the constraint
+		/// </summary>
+		public void CalculateConstraint()
+		{
+			HyperPoint<float> f = _p.ForceAccumulator;
+			HyperPoint<float> x = _p.Position;
+			HyperPoint<float> xD = _p.Velocity;
+			float m = _p.Massa;
+			Func<HyperPoint<float>, HyperPoint<float>, float> dot = HyperPoint<float>.DotProduct;
+
+			float xDot = dot(x, x);
+			float lambda = (-dot(f, x) - m * dot(xD, xD)) / (xDot);
+			HyperPoint<float> fDak = lambda*x;
+			_p.ForceConstraint = fDak;
+
+			HyperPoint<float> _l = x - (x - _center).Normilize()*_radius;
+			HyperPoint<float> _lDot = xD - new HyperPoint<float>(0, 0);
+			float _lAbs = _l.GetLength();
+			if(_lAbs != 0)
+			{
+				HyperPoint<float> _springforce = (_l/_lAbs)*((_lAbs) * 100 + (HyperPoint<float>.DotProduct(_lDot, _l)/_lAbs));
+				_p.ForceAccumulator -= _springforce;
+			}
+		}
+
+		#endregion
 	}
 }

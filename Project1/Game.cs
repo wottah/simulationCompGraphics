@@ -47,7 +47,7 @@ namespace Project1
 		private void InitSystem()
 		{
 			float dist = 0.2f;
-			HyperPoint<float> center = new HyperPoint<float>(0.0f, 0.0f);
+			HyperPoint<float> center = new HyperPoint<float>(0, 0.0f);
 			HyperPoint<float> offset = new HyperPoint<float>(dist, 0.0f);
             mouseForce = new MouseSpringForce(new Particle(new HyperPoint<float>(1f, 1f)), new HyperPoint<float>(1f, 1f), 1f, 1f, 1f);
 
@@ -68,6 +68,13 @@ namespace Project1
             Matrix<float> translate = Matrix<float>.Translate(-1, -1);
             Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f / 320, 1f / 240));
             mouseTranslation = translate * resize;
+
+			Add(new GravityForce(particles, new HyperPoint<float>(0f, -9.8f)));
+			Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
+			Add(new SpringForce(particles[0], particles[2], 0.3f, 1f, 1));
+			Add(new SpringForce(particles[1], particles[2], 0.7f, 1f, 1));
+
+			Add(new CircularWireConstraint(particles[0], new HyperPoint<float>(0f, 0f), 1));
 
 			ClearData();
 		}
@@ -93,7 +100,7 @@ namespace Project1
 			// Write frames if necessary.
 			if (dump_frames)
 			{
-				const int FrameInterval = 4;
+				const int FrameInterval = 1;
 				if((frame_number % FrameInterval) == 0)
 				{
 					using(Bitmap bmp = new Bitmap(Width, Height))
@@ -157,6 +164,17 @@ namespace Project1
 		private void Add(IForce dp)
 		{
 			solver.Forces.Add(dp);
+		}
+
+		private void Add(IDrawableConstraint dp)
+		{
+			Add((IConstraint) dp);
+			Add((IDrawable) dp);
+		}
+
+		private void Add(IConstraint dp)
+		{
+			solver.Constraints.Add(dp);
 		}
 
 		/*

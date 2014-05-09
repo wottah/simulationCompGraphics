@@ -54,9 +54,7 @@
     <Compile Include="CircularWireConstraint.cs" />
     <Compile Include="MouseSpringForce.cs" />
     <Compile Include="GLMath2.cs" />
-    <Compile Include="IDrawable.cs" />
-    <Compile Include="IDrawableForce.cs" />
-    <Compile Include="IForce.cs" />
+    <Compile Include="Interfaces.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GravityForce.cs" />
     <Compile Include="LinearSolver.cs" />
