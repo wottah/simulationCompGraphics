@@ -14,6 +14,8 @@ namespace Project1
 		private HyperPoint<float> _position;
 		private HyperPoint<float> _velocity;
         private HyperPoint<float> _forceAccumulator;
+		private float _massa;
+		private HyperPoint<float> _forceConstraint;
 
 		public HyperPoint<float> ConstructPos
 		{
@@ -33,23 +35,37 @@ namespace Project1
 			set { _velocity = value; }
 		}
 
-        public HyperPoint<float> ForceAccumulator
+		public HyperPoint<float> ForceConstraint
+		{
+			get { return _forceConstraint; }
+			set { _forceConstraint = value; }
+		}
+
+		public HyperPoint<float> ForceAccumulator
         {
             get { return _forceAccumulator; }
             set { _forceAccumulator = value; }
         }
 
-		public Particle(HyperPoint<float> constructPos)
+		public float Massa
+		{
+			get { return _massa; }
+			set { _massa = value; }
+		}
+
+		public Particle(HyperPoint<float> constructPos, float massa = 1f)
 		{
 			_constructPos = constructPos;
-			_position = new HyperPoint<float>(0, 0);
-			_velocity = new HyperPoint<float>(0, 0);
+			_forceAccumulator = new HyperPoint<float>(0, 0);
+			_massa = massa;
+			reset();
 		}
 
 		public void reset()
 		{
 			_position = _constructPos;
-			_velocity = new HyperPoint<float>(0f, 0f);
+			_velocity = new HyperPoint<float>(0, 0);
+			_forceConstraint = new HyperPoint<float>(0, 0);
 		}
 
 		public void Draw()
