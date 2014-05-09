@@ -59,6 +59,7 @@ namespace Project1
 			Add(new GravityForce(new List<Particle>(){particles[0]}, new HyperPoint<float>(0f, -0.01f)));
 			Add(new GravityForce(new List<Particle>(){particles[1]}, new HyperPoint<float>(0f, -0.02f)));
 			Add(new GravityForce(new List<Particle>(){particles[2]}, new HyperPoint<float>(0f, -0.05f)));
+            Add(new SpringForce(particles[0],particles[1],0.5f,0.8f,1));
 
 			ClearData();
 		}
