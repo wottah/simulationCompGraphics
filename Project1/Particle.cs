@@ -13,6 +13,7 @@ namespace Project1
 		private HyperPoint<float> _constructPos;
 		private HyperPoint<float> _position;
 		private HyperPoint<float> _velocity;
+        private HyperPoint<float> _forceAccumulator;
 
 		public HyperPoint<float> ConstructPos
 		{
@@ -31,6 +32,12 @@ namespace Project1
 			get { return _velocity; }
 			set { _velocity = value; }
 		}
+
+        public HyperPoint<float> ForceAccumulator
+        {
+            get { return _forceAccumulator; }
+            set { _forceAccumulator = value; }
+        }
 
 		public Particle(HyperPoint<float> constructPos)
 		{
