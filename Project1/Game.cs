@@ -20,6 +20,8 @@ namespace Project1
 		// static Particle *pList;
 		private List<Particle> particles;
 		private Solver solver;
+        private MouseSpringForce mouseForce;
+        private Matrix<float> mouseTranslation;
 
 		private int win_id;
 		private int win_x, win_y;
@@ -28,8 +30,8 @@ namespace Project1
 		private int[] mouse_shiftclick;
 		private int omx, omy, mx, my;
 		private int hmx, hmy;
+		private List<IDrawable> drawables;
 
-		private List<IDrawable> drawables; 
 
 		/*
 		----------------------------------------------------------------------
@@ -47,6 +49,7 @@ namespace Project1
 			float dist = 0.2f;
 			HyperPoint<float> center = new HyperPoint<float>(0.0f, 0.0f);
 			HyperPoint<float> offset = new HyperPoint<float>(dist, 0.0f);
+            mouseForce = new MouseSpringForce(new Particle(new HyperPoint<float>(1f, 1f)), new HyperPoint<float>(1f, 1f), 1f, 1f, 1f);
 
 			particles = new List<Particle>();
 			drawables = new List<IDrawable>();
@@ -56,10 +59,15 @@ namespace Project1
 			AddParticle(new Particle(center + offset*1));
 			AddParticle(new Particle(center + offset*2));
 
-			Add(new GravityForce(new List<Particle>(){particles[0]}, new HyperPoint<float>(0f, -0.01f)));
-			Add(new GravityForce(new List<Particle>(){particles[1]}, new HyperPoint<float>(0f, -0.02f)));
-			Add(new GravityForce(new List<Particle>(){particles[2]}, new HyperPoint<float>(0f, -0.05f)));
+			//Add(new GravityForce(new List<Particle>(){particles[0]}, new HyperPoint<float>(0f, -0.01f)));
+			//Add(new GravityForce(new List<Particle>(){particles[1]}, new HyperPoint<float>(0f, -0.02f)));
+			//Add(new GravityForce(new List<Particle>(){particles[2]}, new HyperPoint<float>(0f, -0.05f)));
             Add(new SpringForce(particles[0],particles[1],0.5f,0.8f,1));
+            Add(mouseForce);
+
+            Matrix<float> translate = Matrix<float>.Translate(-1, -1);
+            Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f / 320, 1f / 240));
+            mouseTranslation = translate * resize;
 
 			ClearData();
 		}
@@ -188,6 +196,7 @@ namespace Project1
 			if(dsim)
 			{
 				solver.SimulationStep(particles, dt);
+                mouseForce.MousePos = new HyperPoint<float>(Mouse.X, Mouse.Y);
 			}
 			else
 			{
@@ -201,8 +210,30 @@ namespace Project1
 			}
 		}
 
+       
+        private void OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            mouseForce.Disable();
+        }
+
+        private void OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            float _dist = 0.2f;
+            Particle _mousepos = new Particle((HyperPoint<float>)(mouseTranslation*new HyperPoint<float>(e.X,e.Y)));
+            foreach (Particle _p in particles)
+            {
+                if ((_mousepos.Position - _p.Position).GetLength() < _dist)
+                {
+                    mouseForce.Particle = _p;
+                    mouseForce.Enable();
+                }
+            }
+            
+        }
+
 		private void OnKeyUp(object sender, KeyboardKeyEventArgs keyboardKeyEventArgs)
 		{
+            
 		}
 
 		private void OnKeyDown(object sender, KeyboardKeyEventArgs keyboardKeyEventArgs)
@@ -246,6 +277,8 @@ namespace Project1
 			this.RenderFrame += OnRenderFrame;
 			this.KeyDown += OnKeyDown;
 			this.KeyUp += OnKeyUp;
+            this.Mouse.ButtonDown += OnMouseDown;
+            this.Mouse.ButtonUp += OnMouseUp;
 		}
-	}
+    }
 }
