@@ -63,6 +63,7 @@
     <Compile Include="RodConstraint.cs" />
     <Compile Include="Solver.cs" />
     <Compile Include="SpringForce.cs" />
+    <Compile Include="ViscousDragForce.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

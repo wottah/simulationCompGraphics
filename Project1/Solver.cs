@@ -11,8 +11,6 @@ namespace Project1
 		public List<IForce> Forces { get; private set; }
 		public List<IConstraint> Constraints { get; private set; }
 
-		public const float Damp = 0.98f;
-
 		#region Rand
 
 		private static Random rand = new Random();
@@ -36,7 +34,7 @@ namespace Project1
 			particles.ForEach(x => x.ForceAccumulator = new HyperPoint<float>(0f, 0f));
 			Forces.ForEach(x => x.CalculateForce());
 			Constraints.ForEach(x => x.CalculateConstraint());
-			particles.ForEach(x => x.Velocity = x.Velocity*Damp + (x.ForceAccumulator+x.ForceConstraint)/x.Massa*dt);
+			particles.ForEach(x => x.Velocity += (x.ForceAccumulator+x.ForceConstraint)/x.Massa*dt);
 			particles.ForEach(x => x.Position += x.Velocity*dt);
 		}
 	}

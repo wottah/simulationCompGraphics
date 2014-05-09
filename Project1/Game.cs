@@ -56,10 +56,11 @@ namespace Project1
 			AddParticle(new Particle(center + offset*1));
 			AddParticle(new Particle(center + offset*2));
 
-			Add(new GravityForce(particles, new HyperPoint<float>(0f, -9.8f)));
-			Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
-			Add(new SpringForce(particles[0], particles[2], 0.3f, 1f, 1));
-			Add(new SpringForce(particles[1], particles[2], 0.7f, 1f, 1));
+			Add(new GravityForce(particles, new HyperPoint<float>(0f, -1f)));
+			Add(new ViscousDragForce(particles, 2f));
+			Add(new SpringForce(particles[0], particles[1], 0.5f, 10f, 1));
+			Add(new SpringForce(particles[0], particles[2], 0.3f, 10f, 1));
+			Add(new SpringForce(particles[1], particles[2], 0.7f, 10f, 1));
 
 			Add(new CircularWireConstraint(particles[0], new HyperPoint<float>(0f, 0f), 1));
 
