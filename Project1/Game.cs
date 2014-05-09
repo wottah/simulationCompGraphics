@@ -56,9 +56,9 @@ namespace Project1
 			AddParticle(new Particle(center + offset*1));
 			AddParticle(new Particle(center + offset*2));
 
-			AddDrawableForce(new GravityForce(particles[0], new HyperPoint<float>(0f, -0.01f)));
-			AddDrawableForce(new GravityForce(particles[1], new HyperPoint<float>(0f, -0.02f)));
-			AddDrawableForce(new GravityForce(particles[2], new HyperPoint<float>(0f, -0.05f)));
+			Add(new GravityForce(new List<Particle>(){particles[0]}, new HyperPoint<float>(0f, -0.01f)));
+			Add(new GravityForce(new List<Particle>(){particles[1]}, new HyperPoint<float>(0f, -0.02f)));
+			Add(new GravityForce(new List<Particle>(){particles[2]}, new HyperPoint<float>(0f, -0.05f)));
 
 			ClearData();
 		}
@@ -131,16 +131,21 @@ namespace Project1
 		private void AddParticle(Particle p)
 		{
 			particles.Add(p);
+			Add(p);
+		}
+
+		private void Add(IDrawable p)
+		{
 			drawables.Add(p);
 		}
 
-		private void AddDrawableForce(IDrawableForce dp)
+		private void Add(IDrawableForce dp)
 		{
-			drawables.Add(dp);
-			AddForce(dp);
+			Add((IDrawable) dp);
+			Add((IForce) dp);
 		}
 
-		private void AddForce(IForce dp)
+		private void Add(IForce dp)
 		{
 			solver.Forces.Add(dp);
 		}

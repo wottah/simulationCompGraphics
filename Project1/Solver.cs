@@ -31,13 +31,10 @@ namespace Project1
 
 		public void SimulationStep(List<Particle> particles, float dt)
 		{
-			Forces.ForEach(x => x.Step(dt));
-
-			for (int i = 0; i < particles.Count; i++)
-			{
-				particles[i].Position += particles[i].Velocity * dt;
-				//particles[i].Velocity = particles[i].Velocity * Damp + new HyperPoint<float>(GetRandom(), GetRandom()) * 0.005f;
-			}
+			particles.ForEach(x => x.ForceAccumulator = new HyperPoint<float>(0f, 0f));
+			Forces.ForEach(x => x.CalculateForce());
+			particles.ForEach(x => x.Velocity = x.Velocity*Damp + x.ForceAccumulator*dt);
+			particles.ForEach(x => x.Position += x.Velocity*dt);
 		}
 	}
 }
