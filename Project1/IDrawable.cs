@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using micfort.GHL.Math2;
 
 namespace Project1
 {
-	public interface IForce
+	public interface IDrawable
 	{
 		/// <summary>
-		/// Calculate the force
+		/// draw the force if neccesary
 		/// </summary>
-		void CalculateForce();
+		void Draw();
 	}
 }

@@ -7,7 +7,7 @@ using micfort.GHL.Math2;
 
 namespace Project1
 {
-	class GravityForce: IForce
+	class GravityForce : IDrawableForce
 	{
 		private readonly Particle _p;
 		private readonly HyperPoint<float> _g;
@@ -18,7 +18,7 @@ namespace Project1
 			_g = g;
 		}
 
-		#region Implementation of Force
+		#region Implementation of IDrawable
 
 		public void Draw()
 		{
@@ -30,9 +30,17 @@ namespace Project1
 			GL.End();
 		}
 
-		public void Step(float time)
+		#endregion
+
+		#region Implementation of IForce
+
+		/// <summary>
+		/// Calculate the force
+		/// </summary>
+		public void CalculateForce()
 		{
-			_p.Velocity = _p.Velocity + _g*time;
+			
+			return _g;
 		}
 
 		#endregion

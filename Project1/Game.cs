@@ -29,6 +29,8 @@ namespace Project1
 		private int omx, omy, mx, my;
 		private int hmx, hmy;
 
+		private List<IDrawable> drawables; 
+
 		/*
 		----------------------------------------------------------------------
 		free/clear/allocate simulation data
@@ -47,15 +49,18 @@ namespace Project1
 			HyperPoint<float> offset = new HyperPoint<float>(dist, 0.0f);
 
 			particles = new List<Particle>();
-
-			particles.Add(new Particle(center + offset * 1));
-			particles.Add(new Particle(center + offset * 2));
-			particles.Add(new Particle(center + offset * 3));
-
+			drawables = new List<IDrawable>();
 			solver = new Solver();
-			solver.Forces.Add(new GravityForce(particles[0], new HyperPoint<float>(0f, -0.01f)));
-			solver.Forces.Add(new GravityForce(particles[1], new HyperPoint<float>(0f, -0.02f)));
-			solver.Forces.Add(new GravityForce(particles[2], new HyperPoint<float>(0f, -0.05f)));
+
+			AddParticle(new Particle(center + offset*0));
+			AddParticle(new Particle(center + offset*1));
+			AddParticle(new Particle(center + offset*2));
+
+			AddDrawableForce(new GravityForce(particles[0], new HyperPoint<float>(0f, -0.01f)));
+			AddDrawableForce(new GravityForce(particles[1], new HyperPoint<float>(0f, -0.02f)));
+			AddDrawableForce(new GravityForce(particles[2], new HyperPoint<float>(0f, -0.05f)));
+
+			ClearData();
 		}
 
 		/*
@@ -106,21 +111,9 @@ namespace Project1
 			SwapBuffers();
 		}
 
-		private void DrawParticles()
+		private void DrawDrawables()
 		{
-			particles.ForEach(x => x.draw());
-		}
-
-		private void DrawForces()
-		{
-			// change this to iteration over full set
-
-		}
-
-		private void DrawConstraints()
-		{
-			// change this to iteration over full set
-
+			drawables.ForEach(x => x.Draw());
 		}
 		
 		/*
@@ -129,7 +122,28 @@ namespace Project1
 		----------------------------------------------------------------------
 		*/
 
+		/*
+		----------------------------------------------------------------------
+		Helper methods
+		----------------------------------------------------------------------
+		*/
 
+		private void AddParticle(Particle p)
+		{
+			particles.Add(p);
+			drawables.Add(p);
+		}
+
+		private void AddDrawableForce(IDrawableForce dp)
+		{
+			drawables.Add(dp);
+			AddForce(dp);
+		}
+
+		private void AddForce(IForce dp)
+		{
+			solver.Forces.Add(dp);
+		}
 
 		/*
 		----------------------------------------------------------------------
@@ -158,9 +172,7 @@ namespace Project1
 		{
 			PreDisplay();
 
-			DrawForces();
-			DrawConstraints();
-			DrawParticles();
+			DrawDrawables();
 			
 			PostDisplay();
 		}

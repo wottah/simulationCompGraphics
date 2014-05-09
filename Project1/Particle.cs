@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Project1
 {
-	public class Particle
+	public class Particle: IDrawable
 	{
 		private HyperPoint<float> _constructPos;
 		private HyperPoint<float> _position;
@@ -45,7 +45,7 @@ namespace Project1
 			_velocity = new HyperPoint<float>(0f, 0f);
 		}
 
-		public void draw()
+		public void Draw()
 		{
 			const double h = 0.03;
 			GL.Color3(1f, 1f, 1f);
