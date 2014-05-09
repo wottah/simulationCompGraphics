@@ -52,7 +52,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircularWireConstraint.cs" />
+    <Compile Include="Extends.cs" />
+    <Compile Include="IForce.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="GravityForce.cs" />
     <Compile Include="LinearSolver.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="Program.cs" />

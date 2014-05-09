@@ -19,6 +19,7 @@ namespace Project1
 
 		// static Particle *pList;
 		private List<Particle> particles;
+		private Solver solver;
 
 		private int win_id;
 		private int win_x, win_y;
@@ -27,11 +28,6 @@ namespace Project1
 		private int[] mouse_shiftclick;
 		private int omx, omy, mx, my;
 		private int hmx, hmy;
-
-		private SpringForce delete_this_dummy_spring = null;
-		private RodConstraint delete_this_dummy_rod = null;
-		private CircularWireConstraint delete_this_dummy_wire = null;
-
 
 		/*
 		----------------------------------------------------------------------
@@ -56,9 +52,10 @@ namespace Project1
 			particles.Add(new Particle(center + offset * 2));
 			particles.Add(new Particle(center + offset * 3));
 
-			delete_this_dummy_spring = new SpringForce(particles[0], particles[1], dist, 1.0f, 1.0f);
-			delete_this_dummy_rod = new RodConstraint(particles[1], particles[2], dist);
-			delete_this_dummy_wire = new CircularWireConstraint(particles[0], center, dist);
+			solver = new Solver();
+			solver.Forces.Add(new GravityForce(particles[0], new HyperPoint<float>(0f, -0.01f)));
+			solver.Forces.Add(new GravityForce(particles[1], new HyperPoint<float>(0f, -0.02f)));
+			solver.Forces.Add(new GravityForce(particles[2], new HyperPoint<float>(0f, -0.05f)));
 		}
 
 		/*
@@ -117,17 +114,13 @@ namespace Project1
 		private void DrawForces()
 		{
 			// change this to iteration over full set
-			if (delete_this_dummy_spring != null)
-				delete_this_dummy_spring.Draw();
+
 		}
 
 		private void DrawConstraints()
 		{
 			// change this to iteration over full set
-			if (delete_this_dummy_rod != null)
-				delete_this_dummy_rod.Draw();
-			if (delete_this_dummy_wire != null)
-				delete_this_dummy_wire.Draw();
+
 		}
 		
 		/*
@@ -170,33 +163,13 @@ namespace Project1
 			DrawParticles();
 			
 			PostDisplay();
-
-			// render graphics
-			//GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-			//GL.MatrixMode(MatrixMode.Projection);
-			//GL.LoadIdentity();
-			//GL.Ortho(-1.0, 1.0, -1.0, 1.0, 0.0, 4.0);
-
-			//GL.Begin(PrimitiveType.Triangles);
-
-			//GL.Color3(Color.MidnightBlue);
-			//GL.Vertex2(-1.0f, 1.0f);
-			//GL.Color3(Color.SpringGreen);
-			//GL.Vertex2(0.0f, -1.0f);
-			//GL.Color3(Color.Ivory);
-			//GL.Vertex2(1.0f, 1.0f);
-
-			//GL.End();
-
-			//SwapBuffers();
 		}
 
 		private void OnUpdateFrame(object sender, FrameEventArgs frameEventArgs)
 		{
 			if(dsim)
 			{
-				Solver.SimulationStep(particles, dt);
+				solver.SimulationStep(particles, dt);
 			}
 			else
 			{

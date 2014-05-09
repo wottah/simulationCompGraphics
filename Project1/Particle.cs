@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Project1
 {
-	class Particle
+	public class Particle
 	{
 		private HyperPoint<float> _constructPos;
 		private HyperPoint<float> _position;
