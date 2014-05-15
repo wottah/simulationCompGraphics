@@ -20,6 +20,8 @@ namespace Project1
 		// static Particle *pList;
 		private List<Particle> particles;
 		private Solver solver;
+        private MouseSpringForce mouseForce;
+        private Matrix<float> mouseTranslation;
 
 		private int win_id;
 		private int win_x, win_y;
@@ -28,8 +30,10 @@ namespace Project1
 		private int[] mouse_shiftclick;
 		private int omx, omy, mx, my;
 		private int hmx, hmy;
+		private List<IDrawable> drawables;
 
-		private List<IDrawable> drawables; 
+		private HyperPoint<float> VirtualScreenSize;
+
 
 		/*
 		----------------------------------------------------------------------
@@ -44,9 +48,18 @@ namespace Project1
 
 		private void InitSystem()
 		{
+			VirtualScreenSize = new HyperPoint<float>(2, 2);
+
 			float dist = 0.2f;
-			HyperPoint<float> center = new HyperPoint<float>(-1f, 0.0f);
+			HyperPoint<float> center = new HyperPoint<float>(0, 0.5f);
 			HyperPoint<float> offset = new HyperPoint<float>(dist, 0.0f);
+            mouseForce = new MouseSpringForce(null, new HyperPoint<float>(1f, 1f), 0.02f, 100f, 1f);
+
+			Matrix<float> translate = Matrix<float>.Translate(-1, -1);
+			Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f / 320, 1f / 240));
+			Matrix<float> mirror = Matrix<float>.Resize(new HyperPoint<float>(1, -1));
+			Matrix<float> virtualScreenSizeMatrix = Matrix<float>.Resize(VirtualScreenSize);
+			mouseTranslation = virtualScreenSizeMatrix * mirror * translate * resize;
 
 			particles = new List<Particle>();
 			drawables = new List<IDrawable>();
@@ -57,10 +70,14 @@ namespace Project1
 			AddParticle(new Particle(center + offset*2));
 
 			Add(new GravityForce(particles, new HyperPoint<float>(0f, -1f)));
-			Add(new ViscousDragForce(particles, 2f));
-			Add(new SpringForce(particles[0], particles[1], 0.5f, 10f, 1));
-			Add(new SpringForce(particles[0], particles[2], 0.3f, 10f, 1));
-			Add(new SpringForce(particles[1], particles[2], 0.7f, 10f, 1));
+			
+			Add(new SpringForce(particles[0],particles[1],0.5f,1f,1));
+            Add(mouseForce);
+			
+			Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
+			Add(new SpringForce(particles[0], particles[2], 0.3f, 1f, 1));
+			Add(new SpringForce(particles[1], particles[2], 0.7f, 1f, 1));
+			Add(new ViscousDragForce(particles, 0.4f));
 
 			Add(new CircularWireConstraint(particles[0], new HyperPoint<float>(0f, 0f), 1));
 
@@ -78,7 +95,7 @@ namespace Project1
 			GL.Viewport(0, 0, win_x, win_y);
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadIdentity();
-			GL.Ortho(-2.0, 2.0, -2.0, 2.0, -1, 1);
+			GL.Ortho(-VirtualScreenSize.X, VirtualScreenSize.X, -VirtualScreenSize.Y, VirtualScreenSize.Y, -1, 1);
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 		}
@@ -201,6 +218,7 @@ namespace Project1
 		{
 			if(dsim)
 			{
+				mouseForce.MousePos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
 				solver.SimulationStep(particles, dt);
 			}
 			else
@@ -215,8 +233,31 @@ namespace Project1
 			}
 		}
 
+       
+        private void OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            mouseForce.Disable();
+        }
+
+        private void OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            float _dist = 0.02f;
+			HyperPoint<float> _mousepos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(e.X, e.Y, 1))).GetLowerDim(2);
+            foreach (Particle _p in particles)
+            {
+				if ((_mousepos - _p.Position).GetLengthSquared() < _dist * _dist)
+				{
+					mouseForce.MousePos = _mousepos;
+                    mouseForce.Particle = _p;
+                    mouseForce.Enable();
+                }
+            }
+            
+        }
+
 		private void OnKeyUp(object sender, KeyboardKeyEventArgs keyboardKeyEventArgs)
 		{
+            
 		}
 
 		private void OnKeyDown(object sender, KeyboardKeyEventArgs keyboardKeyEventArgs)
@@ -260,6 +301,8 @@ namespace Project1
 			this.RenderFrame += OnRenderFrame;
 			this.KeyDown += OnKeyDown;
 			this.KeyUp += OnKeyUp;
+            this.Mouse.ButtonDown += OnMouseDown;
+            this.Mouse.ButtonUp += OnMouseUp;
 		}
-	}
+    }
 }
