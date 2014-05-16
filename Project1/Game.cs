@@ -53,7 +53,7 @@ namespace Project1
 			float dist = 0.2f;
 			HyperPoint<float> center = new HyperPoint<float>(0, 0.5f);
 			HyperPoint<float> offset = new HyperPoint<float>(dist, 0.0f);
-            mouseForce = new MouseSpringForce(null, new HyperPoint<float>(1f, 1f), 0.02f, 100f, 1f);
+            mouseForce = new MouseSpringForce(null, new HyperPoint<float>(1f, 1f), 0.02f, 100f, 1f,false);
 
 			Matrix<float> translate = Matrix<float>.Translate(-1, -1);
 			Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f / 320, 1f / 240));
@@ -64,28 +64,23 @@ namespace Project1
 			particles = new List<Particle>();
 			drawables = new List<IDrawable>();
 			solver = new Solver();
-
+            
 			AddParticle(new Particle(new HyperPoint<float>(1f, 0)));
 			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)));
 			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)));
-
-			UpdateIndex();
-
-			Add(new GravityForce(particles, new HyperPoint<float>(0f, -0.1f)));
 			
-			//Add(new SpringForce(particles[0],particles[1],0.5f,1f,1));
+			CreateCloth();
+			
             Add(mouseForce);
 			
-			Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
-			//Add(new SpringForce(particles[0], particles[2], 0.3f, 1f, 1));
-			//Add(new SpringForce(particles[1], particles[2], 0.7f, 1f, 1));
-			Add(new ViscousDragForce(particles, 0.4f));
+			//Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
+			//Add(new ViscousDragForce(particles, 0.4f));
+			Add(new GravityForce(particles, new HyperPoint<float>(0, -0.1f)));
 
-			//Add(new CircularWireConstraint(particles[0], new HyperPoint<float>(0f, 0f), 1));
+			//Add(new CircularWireConstraint2(particles[0], new HyperPoint<float>(0f, 0f), 1));
+			//Add(new CircularWireConstraint2(particles[1], new HyperPoint<float>(0.3f, 0f), 0.5f));
 
-			Add(new CircularWireConstraint2(particles[0], new HyperPoint<float>(0f, 0f), 1));
-			Add(new CircularWireConstraint2(particles[1], new HyperPoint<float>(0.3f, 0f), 0.5f));
-
+			UpdateIndex();
 			ClearData();
 		}
 
@@ -102,8 +97,77 @@ namespace Project1
 		OpenGL specific drawing routines
 		----------------------------------------------------------------------
 		*/
+        private void CreateCloth()
+        {
+            float dist = 0.3f;
+            float sheardist = (float)Math.Sqrt(2*(dist * dist));
+            int clothwidth = 8;
+            int clothheigth = clothwidth;
+            HyperPoint<float> offsetx = new HyperPoint<float>(dist, 0.0f);
+            HyperPoint<float> offsety = new HyperPoint<float>(0.0f, -dist);
+            HyperPoint<float> startpos = new HyperPoint<float>(-clothwidth*(dist/2), 1.5f);
+            //create clothmesh and embedded lists
+            List<List<Particle>> clothmesh = new List<List<Particle>>();
+            for (int ii = 0; ii < clothwidth; ii++) clothmesh.Insert(ii, new List<Particle>());
+            for (int i = 0; i < clothwidth; i++)
+            {
+                for (int j = 0; j < clothheigth; j++)
+                {
+                    HyperPoint<float> _pos = startpos + offsetx * i + offsety * j;
+                    Particle _p = new Particle(_pos, 1);
 
-		private void PreDisplay()
+                    //addparticle
+                    clothmesh[i].Add(_p);
+                }
+            }
+            for (int i = 0; i < clothwidth; i++)
+            {
+                for (int j = 0; j < clothheigth; j++)
+                {
+                    Particle _p = clothmesh[i][j];
+                    //add forces!
+                    //structural?
+                    if(i>0) Add(new SpringForce(_p,clothmesh[i-1][j],dist,50f,1f));
+                    if(j>0) Add(new SpringForce(_p, clothmesh[i][j-1],dist,50f,1f));
+                    //shear?
+                        if (j > 0)
+                        {
+                            if (i > 0)
+                            {
+                                Add(new SpringForce(_p, clothmesh[i - 1][j - 1], sheardist, 30, 1f));
+                            }
+                            if (i < clothwidth - 1)
+                            {
+                                Add(new SpringForce(_p, clothmesh[i + 1][j - 1], sheardist, 30, 1f));
+                            }
+                        }
+
+                    //flexion?
+                    if (i > 1) Add(new SpringForce(_p, clothmesh[i - 2][j], 2 * dist, 10f, 1f));
+                    if (j > 1) Add(new SpringForce(_p, clothmesh[i][j - 2], 2 * dist, 10f, 1f));
+
+                    
+                }
+            }
+            //create hangup particles
+            Add(new MouseSpringForce(clothmesh[0][0],clothmesh[0][0].Position,0.1f,1000f,30f,true));
+            Add(new MouseSpringForce(clothmesh[clothmesh.Count-1][0], clothmesh[clothmesh.Count-1][0].Position, 0.1f, 1000f, 30f, true));
+            foreach(List<Particle> _column in clothmesh)
+            {
+                foreach (Particle _part in _column)
+                {
+                    AddParticle(_part);
+                }
+            }
+        }
+
+        /*
+        ----------------------------------------------------------------------
+        OpenGL specific drawing routines
+        ----------------------------------------------------------------------
+        */
+
+        private void PreDisplay()
 		{
 			GL.Viewport(0, 0, win_x, win_y);
 			GL.MatrixMode(MatrixMode.Projection);
@@ -243,7 +307,7 @@ namespace Project1
 			if(dsim)
 			{
 				mouseForce.MousePos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
-				for (int i = 0; i < 100; i++)
+				for (int i = 0; i < 10; i++)
 				{
 					solver.SimulationStep(particles, dt);	
 				}
@@ -268,7 +332,7 @@ namespace Project1
 
         private void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            float _dist = 0.02f;
+            float _dist = 0.06f;
 			HyperPoint<float> _mousepos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(e.X, e.Y, 1))).GetLowerDim(2);
             foreach (Particle _p in particles)
             {
