@@ -66,7 +66,7 @@ namespace Project1
 			solver = new Solver();
 
 			AddParticle(new Particle(new HyperPoint<float>(1f, 0)));
-			//AddParticle(new Particle(new HyperPoint<float>(0.5f, 0)));
+			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)));
 			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)));
 
 			UpdateIndex();
@@ -76,7 +76,7 @@ namespace Project1
 			//Add(new SpringForce(particles[0],particles[1],0.5f,1f,1));
             Add(mouseForce);
 			
-			//Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
+			Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
 			//Add(new SpringForce(particles[0], particles[2], 0.3f, 1f, 1));
 			//Add(new SpringForce(particles[1], particles[2], 0.7f, 1f, 1));
 			Add(new ViscousDragForce(particles, 0.4f));
@@ -84,7 +84,7 @@ namespace Project1
 			//Add(new CircularWireConstraint(particles[0], new HyperPoint<float>(0f, 0f), 1));
 
 			Add(new CircularWireConstraint2(particles[0], new HyperPoint<float>(0f, 0f), 1));
-			//Add(new CircularWireConstraint2(particles[1], new HyperPoint<float>(0f, 0f), 0.5f));
+			Add(new CircularWireConstraint2(particles[1], new HyperPoint<float>(0.3f, 0f), 0.5f));
 
 			ClearData();
 		}
@@ -243,7 +243,10 @@ namespace Project1
 			if(dsim)
 			{
 				mouseForce.MousePos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
-				solver.SimulationStep(particles, dt);
+				for (int i = 0; i < 100; i++)
+				{
+					solver.SimulationStep(particles, dt);	
+				}
 			}
 			else
 			{

@@ -34,7 +34,7 @@ namespace Project1
 			using (var game = new Game(N, dt, d))
 			{
 				// Run the game at 60 updates per second
-				game.Run(200);
+				game.Run(60.0);
 			}
 		}
 	}
