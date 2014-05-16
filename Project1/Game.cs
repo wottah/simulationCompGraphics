@@ -65,23 +65,36 @@ namespace Project1
 			drawables = new List<IDrawable>();
 			solver = new Solver();
 
-			AddParticle(new Particle(center + offset*0));
-			AddParticle(new Particle(center + offset*1));
-			AddParticle(new Particle(center + offset*2));
+			AddParticle(new Particle(new HyperPoint<float>(1f, 0)));
+			//AddParticle(new Particle(new HyperPoint<float>(0.5f, 0)));
+			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)));
 
-			Add(new GravityForce(particles, new HyperPoint<float>(0f, -1f)));
+			UpdateIndex();
+
+			Add(new GravityForce(particles, new HyperPoint<float>(0f, -0.1f)));
 			
-			Add(new SpringForce(particles[0],particles[1],0.5f,1f,1));
+			//Add(new SpringForce(particles[0],particles[1],0.5f,1f,1));
             Add(mouseForce);
 			
-			Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
-			Add(new SpringForce(particles[0], particles[2], 0.3f, 1f, 1));
-			Add(new SpringForce(particles[1], particles[2], 0.7f, 1f, 1));
+			//Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
+			//Add(new SpringForce(particles[0], particles[2], 0.3f, 1f, 1));
+			//Add(new SpringForce(particles[1], particles[2], 0.7f, 1f, 1));
 			Add(new ViscousDragForce(particles, 0.4f));
 
-			Add(new CircularWireConstraint(particles[0], new HyperPoint<float>(0f, 0f), 1));
+			//Add(new CircularWireConstraint(particles[0], new HyperPoint<float>(0f, 0f), 1));
+
+			Add(new CircularWireConstraint2(particles[0], new HyperPoint<float>(0f, 0f), 1));
+			//Add(new CircularWireConstraint2(particles[1], new HyperPoint<float>(0f, 0f), 0.5f));
 
 			ClearData();
+		}
+
+		private void UpdateIndex()
+		{
+			for (int i = 0; i < particles.Count; i++)
+			{
+				particles[i].Index = i;
+			}
 		}
 
 		/*
@@ -180,6 +193,17 @@ namespace Project1
 		private void Add(IConstraint dp)
 		{
 			solver.Constraints.Add(dp);
+		}
+
+		private void Add(IConstraint2 dp)
+		{
+			solver.Constraints2.Add(dp);
+		}
+
+		private void Add(IDrawableConstraint2 dp)
+		{
+			Add((IConstraint2)dp);
+			Add((IDrawable)dp);
 		}
 
 		/*

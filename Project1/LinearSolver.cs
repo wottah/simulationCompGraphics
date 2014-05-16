@@ -10,20 +10,20 @@ namespace Project1
 	{
 		public const int MaxSteps = 100;
 
-		public static double ConjGrad(int n, Matrix<double> A, HyperPoint<double> x, HyperPoint<double> b, double epsilon, ref int steps)
+		public static float ConjGrad(int n, Matrix<float> A, out HyperPoint<float> x, HyperPoint<float> b, float epsilon, ref int steps)
 		{
 			int i, iMax;
-			double alpha, beta, rSqrLen, rSqrLenOld, u;
+			float alpha, beta, rSqrLen, rSqrLenOld, u;
 
-			HyperPoint<double> r = new HyperPoint<double>(n);
-			HyperPoint<double> d = new HyperPoint<double>(n);
-			HyperPoint<double> t = new HyperPoint<double>(n);
-			HyperPoint<double> temp = new HyperPoint<double>(n);
+			HyperPoint<float> r = new HyperPoint<float>(n);
+			HyperPoint<float> d = new HyperPoint<float>(n);
+			HyperPoint<float> t = new HyperPoint<float>(n);
+			HyperPoint<float> temp = new HyperPoint<float>(n);
 
 			x = b;
 
 			r = b;
-			temp = (HyperPoint<double>)(A*x);
+			temp = (HyperPoint<float>)(A * x);
 			r = r - temp;
 
 			rSqrLen = r.GetLengthSquared();
@@ -38,8 +38,8 @@ namespace Project1
 				while (i< iMax)
 				{
 					i++;
-					t = (HyperPoint<double>) (A*d);
-					u = HyperPoint<double>.DotProduct(d, t);
+					t = (HyperPoint<float>)(A * d);
+					u = HyperPoint<float>.DotProduct(d, t);
 					if(u == 0)
 					{
 						Console.Out.WriteLine("(SolveConjGrad) d'Ad = 0\n");
@@ -63,7 +63,7 @@ namespace Project1
 					{
 						// For stability, correct r every 64th iteration
 						r = b;
-						temp = (HyperPoint<double>) (A*x);
+						temp = (HyperPoint<float>)(A * x);
 						r = r - temp;
 					}
 

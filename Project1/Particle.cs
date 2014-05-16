@@ -16,6 +16,7 @@ namespace Project1
         private HyperPoint<float> _forceAccumulator;
 		private float _massa;
 		private HyperPoint<float> _forceConstraint;
+		private int _index;
 
 		public HyperPoint<float> ConstructPos
 		{
@@ -51,6 +52,12 @@ namespace Project1
 		{
 			get { return _massa; }
 			set { _massa = value; }
+		}
+
+		public int Index
+		{
+			get { return _index; }
+			set { _index = value; }
 		}
 
 		public Particle(HyperPoint<float> constructPos, float massa = 1f)
