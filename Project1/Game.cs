@@ -100,6 +100,7 @@ namespace Project1
         private void CreateCloth()
         {
             float dist = 0.3f;
+            float tc = 1.1f;
             float sheardist = (float)Math.Sqrt(2*(dist * dist));
             int clothwidth = 8;
             int clothheigth = clothwidth;
@@ -127,18 +128,28 @@ namespace Project1
                     Particle _p = clothmesh[i][j];
                     //add forces!
                     //structural?
-                    if(i>0) Add(new SpringForce(_p,clothmesh[i-1][j],dist,50f,1f));
-                    if(j>0) Add(new SpringForce(_p, clothmesh[i][j-1],dist,50f,1f));
+                    if (i > 0)
+                    {
+                        Add(new SpringForce(_p, clothmesh[i - 1][j], dist, 50f, 1f));
+                        Add(new RodConstraint(_p, clothmesh[i - 1][j], dist * tc));
+                    }
+                    if (j > 0)
+                    {
+                        Add(new SpringForce(_p, clothmesh[i][j - 1], dist, 50f, 1f));
+                        Add(new RodConstraint(_p, clothmesh[i][j - 1], dist * tc));
+                    }
                     //shear?
                         if (j > 0)
                         {
                             if (i > 0)
                             {
                                 Add(new SpringForce(_p, clothmesh[i - 1][j - 1], sheardist, 30, 1f));
+                                Add(new RodConstraint(_p, clothmesh[i - 1][j - 1], sheardist * tc));
                             }
                             if (i < clothwidth - 1)
                             {
                                 Add(new SpringForce(_p, clothmesh[i + 1][j - 1], sheardist, 30, 1f));
+                                Add(new RodConstraint(_p, clothmesh[i + 1][j - 1], sheardist * tc));
                             }
                         }
 
@@ -150,8 +161,11 @@ namespace Project1
                 }
             }
             //create hangup particles
-            Add(new MouseSpringForce(clothmesh[0][0],clothmesh[0][0].Position,0.1f,1000f,30f,true));
-            Add(new MouseSpringForce(clothmesh[clothmesh.Count-1][0], clothmesh[clothmesh.Count-1][0].Position, 0.1f, 1000f, 30f, true));
+            //Add(new MouseSpringForce(clothmesh[0][0],clothmesh[0][0].Position,0.1f,1000f,30f,true));
+            //Add(new MouseSpringForce(clothmesh[clothmesh.Count-1][0], clothmesh[clothmesh.Count-1][0].Position, 0.1f, 1000f, 30f, true));
+            Add(new HorizontalWireConstraint(clothmesh[0][0],clothmesh[0][0].Position.Y));
+            Add(new HorizontalWireConstraint(clothmesh[Convert.ToInt32(Math.Floor((clothmesh.Count - 1)/2f))][0],clothmesh[0][0].Position.Y));
+            Add(new HorizontalWireConstraint(clothmesh[clothmesh.Count - 1][0], clothmesh[0][0].Position.Y));
             foreach(List<Particle> _column in clothmesh)
             {
                 foreach (Particle _part in _column)
