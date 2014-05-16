@@ -16,14 +16,14 @@ namespace Project1
         private readonly float _kd;
         private bool _isEnabled;
 
-        public MouseSpringForce(Particle p1, HyperPoint<float> mousePos, float r, float ks, float kd)
+        public MouseSpringForce(Particle p1, HyperPoint<float> mousePos, float r, float ks, float kd, bool isEnabled)
 		{
 			_p1 = p1;
 			_p2 = new Particle(mousePos);
 			_r = r;
 			_ks = ks;
 			_kd = kd;
-            _isEnabled = false;
+            _isEnabled = isEnabled;
 		}
 
         public Particle Particle

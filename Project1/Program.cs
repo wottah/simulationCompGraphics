@@ -20,7 +20,7 @@ namespace Project1
 			if (args.Length == 0)
 			{
 				N = 64;
-				dt = 0.1f;
+				dt = 0.01f;
 				d = 5.0f;
 				
 			}
@@ -34,7 +34,7 @@ namespace Project1
 			using (var game = new Game(N, dt, d))
 			{
 				// Run the game at 60 updates per second
-				game.Run(60.0);
+				game.Run(200.0);
 			}
 		}
 	}
