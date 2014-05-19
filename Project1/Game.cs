@@ -34,6 +34,7 @@ namespace Project1
 		private int omx, omy, mx, my;
 		private int hmx, hmy;
 		private List<IDrawable> drawables;
+		private float SpeedUp = 0.25f;
 
 		private HyperPoint<float> VirtualScreenSize;
 
@@ -172,7 +173,7 @@ namespace Project1
 
 		private void UpdateHeader()
 		{
-			this.Title = string.Format("Tinkertoys (dt={0}, solver={1})", dt, _solverEnvironment.Solver.Name);
+			this.Title = string.Format("Tinkertoys (dt={0}, solver={1}, speedup={2})", dt, _solverEnvironment.Solver.Name, SpeedUp);
 		}
 
 
@@ -300,7 +301,8 @@ namespace Project1
 			{
 				mouseForce.MousePos =
 					((HyperPoint<float>) (mouseTranslation*new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
-				for (int i = 0; i < N; i++)
+				int steps = Math.Max(1, Convert.ToInt32(Math.Round(1 / dt * SpeedUp)));
+				for (int i = 0; i < steps; i++)
 				{
 					_solverEnvironment.SimulationStep(particles, dt);
 				}
@@ -371,6 +373,16 @@ namespace Project1
 
 				case Key.Down:
 					dt /= 2;
+					UpdateHeader();
+					break;
+
+				case Key.Left:
+					SpeedUp /= 2;
+					UpdateHeader();
+					break;
+
+				case Key.Right:
+					SpeedUp *= 2;
 					UpdateHeader();
 					break;
 
