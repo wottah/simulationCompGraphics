@@ -24,7 +24,7 @@ namespace Project1
 			return output;
 		}
 
-		public static Matrix<float> Create(int particleCount, List<IConstraint2> c)
+		public static Matrix<float> Create(int particleCount, List<IConstraint> c)
 		{
 			Matrix<float> output = new Matrix<float>(c.Count, particleCount*2);
 			for (int i = 0; i < c.Count; i++)
@@ -44,7 +44,7 @@ namespace Project1
 			return output;
 		}
 
-		public static Matrix<float> CreateDerivative(int particleCount, List<IConstraint2> c)
+		public static Matrix<float> CreateDerivative(int particleCount, List<IConstraint> c)
 		{
 			Matrix<float> output = new Matrix<float>(c.Count, particleCount * 2);
 			for (int i = 0; i < c.Count; i++)

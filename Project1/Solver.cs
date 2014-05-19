@@ -10,7 +10,6 @@ namespace Project1
 	{
 		public List<IForce> Forces { get; private set; }
 		public List<IConstraint> Constraints { get; private set; }
-		public List<IConstraint2> Constraints2 { get; private set; }
 
 		#region Rand
 
@@ -28,7 +27,6 @@ namespace Project1
 		{
 			Forces = new List<IForce>();
 			Constraints = new List<IConstraint>();
-			Constraints2 = new List<IConstraint2>();
 		}
 
 		public void SimulationStep(List<Particle> particles, float dt)
@@ -59,16 +57,16 @@ namespace Project1
 				Q[i*2 + 1] = particles[i].ForceAccumulator[1];
 			}
 
-			HyperPoint<float> c = new HyperPoint<float>(Constraints2.Count);
-			HyperPoint<float> cDot = new HyperPoint<float>(Constraints2.Count);
-			for (int i = 0; i < Constraints2.Count; i++)
+			HyperPoint<float> c = new HyperPoint<float>(Constraints.Count);
+			HyperPoint<float> cDot = new HyperPoint<float>(Constraints.Count);
+			for (int i = 0; i < Constraints.Count; i++)
 			{
-				c[i] = Constraints2[i].Calculate();
-				cDot[i] = Constraints2[i].CalculateTD();
+				c[i] = Constraints[i].Calculate();
+				cDot[i] = Constraints[i].CalculateTD();
 			}
 
-			Matrix<float> J = JacobianMatrix.Create(particles.Count, Constraints2);
-			Matrix<float> JDot = JacobianMatrix.CreateDerivative(particles.Count, Constraints2);
+			Matrix<float> J = JacobianMatrix.Create(particles.Count, Constraints);
+			Matrix<float> JDot = JacobianMatrix.CreateDerivative(particles.Count, Constraints);
 			Matrix<float> JT = J.Transpose();
 
 			Matrix<float> A = J*W*JT;

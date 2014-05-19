@@ -7,13 +7,13 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Project1
 {
-	class CircularWireConstraint2 : IDrawableConstraint2
+	class CircularWireConstraint : IDrawableConstraint
 	{
 		private readonly Particle _p;
 		private readonly HyperPoint<float> _center;
 		private readonly float _radius;
 
-		public CircularWireConstraint2(Particle p, HyperPoint<float> center, float radius)
+		public CircularWireConstraint(Particle p, HyperPoint<float> center, float radius)
 		{
 			_p = p;
 			_center = center;

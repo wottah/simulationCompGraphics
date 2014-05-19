@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL;
 namespace Project1
 {
 	
-	class HorizontalWireConstraint : IDrawableConstraint2
+	class HorizontalWireConstraint : IDrawableConstraint
 	{
 		private readonly Particle _p;
         private readonly float _linepos;

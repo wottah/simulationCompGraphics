@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Project1
 {
-	class InCircularConstraint : IDrawableConstraint2
+	class InCircularConstraint : IDrawableConstraint
 	{
 		private readonly Particle _p;
 		private readonly HyperPoint<float> _center;

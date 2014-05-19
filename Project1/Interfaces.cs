@@ -14,14 +14,6 @@ namespace Project1
 		void CalculateForce();
 	}
 
-	public interface IConstraint
-	{
-		/// <summary>
-		/// Calculate the constraint
-		/// </summary>
-		void CalculateConstraint();
-	}
-
 	public interface IDrawable
 	{
 		/// <summary>
@@ -36,7 +28,7 @@ namespace Project1
 		public HyperPoint<float> Constraint;
 	}
 
-	public interface IConstraint2
+	public interface IConstraint
 	{
 		float Calculate();
 		float CalculateTD();
@@ -49,10 +41,6 @@ namespace Project1
 	}
 
 	interface IDrawableConstraint : IDrawable, IConstraint
-	{
-	}
-
-	interface IDrawableConstraint2 : IDrawable, IConstraint2
 	{
 	}
 }

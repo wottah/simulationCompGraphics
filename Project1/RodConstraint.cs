@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Project1
 {
-	class RodConstraint: IDrawableConstraint2
+	class RodConstraint: IDrawableConstraint
 	{
 		private readonly Particle _p1;
 		private readonly Particle _p2;

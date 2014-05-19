@@ -78,8 +78,8 @@ namespace Project1
 			//Add(new ViscousDragForce(particles, 0.4f));
 			Add(new GravityForce(particles, new HyperPoint<float>(0, -0.1f)));
 			
-			Add(new CircularWireConstraint2(particles[0], new HyperPoint<float>(0f, 0f), 1));
-			Add(new CircularWireConstraint2(particles[1], new HyperPoint<float>(0.3f, 0f), 0.5f));
+			Add(new CircularWireConstraint(particles[0], new HyperPoint<float>(0f, 0f), 1));
+			Add(new CircularWireConstraint(particles[1], new HyperPoint<float>(0.3f, 0f), 0.5f));
 
 			UpdateIndex();
 			ClearData();
@@ -272,17 +272,6 @@ namespace Project1
 		private void Add(IConstraint dp)
 		{
 			solver.Constraints.Add(dp);
-		}
-
-		private void Add(IConstraint2 dp)
-		{
-			solver.Constraints2.Add(dp);
-		}
-
-		private void Add(IDrawableConstraint2 dp)
-		{
-			Add((IConstraint2)dp);
-			Add((IDrawable)dp);
 		}
 
 		/*
