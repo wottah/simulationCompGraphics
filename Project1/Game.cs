@@ -56,9 +56,6 @@ namespace Project1
 		{
 			VirtualScreenSize = new HyperPoint<float>(2, 2);
 
-			float dist = 0.2f;
-			HyperPoint<float> center = new HyperPoint<float>(0, 0.5f);
-			HyperPoint<float> offset = new HyperPoint<float>(dist, 0.0f);
 			mouseForce = new MouseSpringForce(0, new HyperPoint<float>(1f, 1f), 0.02f, 100f, 1f, false);
 
 			Matrix<float> translate = Matrix<float>.Translate(-1, -1);
@@ -72,14 +69,23 @@ namespace Project1
 			_solverEnvironment = new SolverEnvironment();
 			_solverEnvironment.Solver = new EulerSolver();
 
-			AddParticle(new Particle(new HyperPoint<float>(1f, 0)) {Color = new HyperPoint<float>(0, 0, 1)});
-			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)) { Color = new HyperPoint<float>(0, 1, 1) });
-			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
 			//CreateCloth();
-
-			List<int> particleIndexes = particles.ConvertAll(x => x.Index);
+			CreateHair();
+			//CreateParticleSceneMichiel();
 
 			Add(mouseForce);
+
+			ClearData();
+			UpdateHeader();
+		}
+
+		private void CreateParticleSceneMichiel()
+		{
+			AddParticle(new Particle(new HyperPoint<float>(1f, 0)) { Color = new HyperPoint<float>(0, 0, 1) });
+			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)) { Color = new HyperPoint<float>(0, 1, 1) });
+			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
+
+			List<int> particleIndexes = particles.ConvertAll(x => x.Index);
 
 			Add(new SpringForce(0, 1, 0.5f, 1f, 1));
 			Add(new SpringForce(1, 2, 0.5f, 1f, 1));
@@ -88,10 +94,6 @@ namespace Project1
 
 			Add(new CircularWireConstraint(0, new HyperPoint<float>(0f, 0f), 1));
 			Add(new CircularWireConstraint(1, new HyperPoint<float>(0.3f, 0f), 0.5f));
-
-
-			ClearData();
-			UpdateHeader();
 		}
 
 		private void CreateCloth()
@@ -166,9 +168,50 @@ namespace Project1
 			Add(new HorizontalWireConstraint(clothmesh[clothmesh.Count - 1][0].Index, clothmesh[0][0].Position.Y));
 		}
 
-		private int CalculateIndex(int x, int y, int height, int offset)
+		private void CreateHair()
 		{
-			return x*height + y + offset;
+			double beta = Math.PI/2;
+			HyperPoint<float> startPosition = new HyperPoint<float>(0, 1f);
+			HyperPoint<float> unitSize = new HyperPoint<float>(0, -0.05f);
+			HyperPoint<float> diffLeftRight = new HyperPoint<float>(Convert.ToSingle(Math.Cos(beta/2)*unitSize.GetLength()), 0f);
+			float springDist = Convert.ToSingle(2*unitSize.GetLength()*Math.Sin(beta));
+			int particleCount = 10;
+			List<Particle> hair = new List<Particle>();
+			for (int i = 0; i < particleCount; i++)
+			{
+				Particle p = new Particle(startPosition + i*unitSize);
+				AddParticle(p);
+				hair.Add(p);
+			}
+
+			for (int i = 0; i < particleCount-2; i++)
+			{
+				SpringForce sp = new SpringForce(i, i + 2, springDist, 1, 1);
+				Add(sp);
+			}
+			for (int i = 0; i < particleCount - 1; i++)
+			{
+				RodConstraint rc = new RodConstraint(i, i + 1, unitSize.GetLength());
+				Add(rc);
+			}
+			for (int i = 0; i < particleCount; i++)
+			{
+				if(i % 2 == 0)
+				{
+					hair[i].ConstructPos = hair[i].ConstructPos + diffLeftRight/2;
+				}
+				else
+				{
+					hair[i].ConstructPos = hair[i].ConstructPos - diffLeftRight/2;
+				}
+				hair[i].Position = hair[i].ConstructPos;
+			}
+
+			Add(new CircularWireConstraint(hair[0].Index, startPosition, 0));
+
+			List<int> particleIndexes = hair.ConvertAll(x => x.Index);
+			Add(new ViscousDragForce(particleIndexes, 1f));
+			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -0.1f)));
 		}
 
 		private void UpdateHeader()
