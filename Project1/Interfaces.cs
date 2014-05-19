@@ -38,8 +38,8 @@ namespace Project1
 
 	public interface IConstraint2
 	{
-		float Calculate(HyperPoint<float> q);
-		float CalculateTD(HyperPoint<float> q, HyperPoint<float> qDot);
+		float Calculate();
+		float CalculateTD();
 		List<ResultingConstraint> CalculateQD();
 		List<ResultingConstraint> CalculateQDTD();
 	}

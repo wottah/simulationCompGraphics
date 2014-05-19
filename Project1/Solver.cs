@@ -63,8 +63,8 @@ namespace Project1
 			HyperPoint<float> cDot = new HyperPoint<float>(Constraints2.Count);
 			for (int i = 0; i < Constraints2.Count; i++)
 			{
-				c[i] = Constraints2[i].Calculate(q);
-				cDot[i] = Constraints2[i].CalculateTD(q, qDot);
+				c[i] = Constraints2[i].Calculate();
+				cDot[i] = Constraints2[i].CalculateTD();
 			}
 
 			Matrix<float> J = JacobianMatrix.Create(particles.Count, Constraints2);

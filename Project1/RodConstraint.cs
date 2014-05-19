@@ -31,14 +31,14 @@ namespace Project1
 
 		#region Implementation of IConstraint2
 
-		public float Calculate(HyperPoint<float> q)
+		public float Calculate()
 		{
 			float x = _p1.Position.X - _p2.Position.X;
 			float y = _p1.Position.Y - _p2.Position.Y;
 			return x*x + y*y - _dist*_dist;
 		}
 
-		public float CalculateTD(HyperPoint<float> q, HyperPoint<float> qDot)
+		public float CalculateTD()
 		{
 			float x = _p1.Position.X - _p2.Position.X;
 			float y = _p1.Position.Y - _p2.Position.Y;

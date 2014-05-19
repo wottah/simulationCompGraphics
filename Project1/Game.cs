@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using OpenTK;
@@ -69,16 +70,16 @@ namespace Project1
 			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)));
 			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)));
 			
-			CreateCloth();
+			//CreateCloth();
 			
             Add(mouseForce);
 			
 			//Add(new SpringForce(particles[0], particles[1], 0.5f, 1f, 1));
 			//Add(new ViscousDragForce(particles, 0.4f));
 			Add(new GravityForce(particles, new HyperPoint<float>(0, -0.1f)));
-
-			//Add(new CircularWireConstraint2(particles[0], new HyperPoint<float>(0f, 0f), 1));
-			//Add(new CircularWireConstraint2(particles[1], new HyperPoint<float>(0.3f, 0f), 0.5f));
+			
+			Add(new CircularWireConstraint2(particles[0], new HyperPoint<float>(0f, 0f), 1));
+			Add(new CircularWireConstraint2(particles[1], new HyperPoint<float>(0.3f, 0f), 0.5f));
 
 			UpdateIndex();
 			ClearData();
