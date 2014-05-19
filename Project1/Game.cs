@@ -26,13 +26,7 @@ namespace Project1
         private MouseSpringForce mouseForce;
         private Matrix<float> mouseTranslation;
 
-		private int win_id;
-		private int win_x, win_y;
-		private int[] mouse_down;
-		private int[] mouse_release;
-		private int[] mouse_shiftclick;
-		private int omx, omy, mx, my;
-		private int hmx, hmy;
+		private string systemName = string.Empty;
 		private List<IDrawable> drawables;
 		private float SpeedUp = 0.25f;
 
@@ -52,35 +46,30 @@ namespace Project1
 			particles.ForEach(x => x.reset());
 		}
 
-		private void InitSystem()
+		private void InitSystem(Action createSystem)
 		{
-			VirtualScreenSize = new HyperPoint<float>(2, 2);
-
-			mouseForce = new MouseSpringForce(0, new HyperPoint<float>(1f, 1f), 0.02f, 100f, 1f, false);
-
-			Matrix<float> translate = Matrix<float>.Translate(-1, -1);
-			Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f/320, 1f/240));
-			Matrix<float> mirror = Matrix<float>.Resize(new HyperPoint<float>(1, -1));
-			Matrix<float> virtualScreenSizeMatrix = Matrix<float>.Resize(VirtualScreenSize);
-			mouseTranslation = virtualScreenSizeMatrix*mirror*translate*resize;
+			dsim = false;
+			dump_frames = false;
 
 			particles = new List<Particle>();
 			drawables = new List<IDrawable>();
+			
 			_solverEnvironment = new SolverEnvironment();
 			_solverEnvironment.Solver = new EulerSolver();
 
-			//CreateCloth();
-			CreateHair();
-			//CreateParticleSceneMichiel();
-
+			mouseForce = new MouseSpringForce(0, new HyperPoint<float>(1f, 1f), 0.02f, 100f, 1f, false);
 			Add(mouseForce);
+
+			createSystem();
 
 			ClearData();
 			UpdateHeader();
 		}
 
-		private void CreateParticleSceneMichiel()
+		private void CreateParticleScene()
 		{
+			systemName = "Particle";
+
 			AddParticle(new Particle(new HyperPoint<float>(1f, 0)) { Color = new HyperPoint<float>(0, 0, 1) });
 			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)) { Color = new HyperPoint<float>(0, 1, 1) });
 			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
@@ -102,6 +91,8 @@ namespace Project1
 
 		private void CreateCloth()
 		{
+			systemName = "Cloth";
+
 			float dist = 0.3f;
 			float tc = 1.1f;
 			float sheardist = (float) Math.Sqrt(2*(dist*dist));
@@ -174,9 +165,11 @@ namespace Project1
 
 		private void CreateHair()
 		{
+			systemName = "Hair";
+
 			double beta = Math.PI/2;
 			HyperPoint<float> startPosition = new HyperPoint<float>(0, 1f);
-			HyperPoint<float> unitSize = new HyperPoint<float>(0, -0.1f);
+			HyperPoint<float> unitSize = new HyperPoint<float>(0, -0.2f);
 			HyperPoint<float> diffLeftRight = new HyperPoint<float>(Convert.ToSingle(Math.Cos(beta/2)*unitSize.GetLength()), 0f);
 			float springDist = Convert.ToSingle(2*unitSize.GetLength()*Math.Sin(beta));
 			int particleCount = 10;
@@ -190,7 +183,7 @@ namespace Project1
 
 			for (int i = 0; i < particleCount-2; i++)
 			{
-				SpringForce sp = new SpringForce(i, i + 2, springDist, 50, 50);
+				SpringForce sp = new SpringForce(i, i + 2, springDist, 5000, 1);
 				Add(sp);
 			}
 			for (int i = 0; i < particleCount - 1; i++)
@@ -220,7 +213,17 @@ namespace Project1
 
 		private void UpdateHeader()
 		{
-			this.Title = string.Format("Tinkertoys (dt={0}, solver={1}, speedup={2})", dt, _solverEnvironment.Solver.Name, SpeedUp);
+			this.Title = string.Format("{3} system (dt={0}, solver={1}, speedup={2})", dt, _solverEnvironment.Solver.Name,
+			                           SpeedUp, systemName);
+		}
+
+		private void UpdateMouseMatrix()
+		{
+			Matrix<float> translate = Matrix<float>.Translate(-1, -1);
+			Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f / (Width / 2), 1f / (Height / 2)));
+			Matrix<float> mirror = Matrix<float>.Resize(new HyperPoint<float>(1, -1));
+			Matrix<float> virtualScreenSizeMatrix = Matrix<float>.Resize(VirtualScreenSize);
+			mouseTranslation = virtualScreenSizeMatrix * mirror * translate * resize;
 		}
 
 
@@ -230,7 +233,7 @@ namespace Project1
 
 		private void PreDisplay()
 		{
-			GL.Viewport(0, 0, win_x, win_y);
+			GL.Viewport(0, 0, Width, Height);
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadIdentity();
 			GL.Ortho(-VirtualScreenSize.X, VirtualScreenSize.X, -VirtualScreenSize.Y, VirtualScreenSize.Y, -1, 1);
@@ -322,15 +325,17 @@ namespace Project1
 			// setup settings, load textures, sounds
 			VSync = VSyncMode.On;
 
+			VirtualScreenSize = new HyperPoint<float>(2, 2);
+
+			UpdateMouseMatrix();
+
 			GL.Enable(EnableCap.LineSmooth);
 			GL.Enable(EnableCap.PolygonSmooth);
 		}
 
 		private void OnResize(object sender, EventArgs eventArgs)
 		{
-			GL.Viewport(0, 0, Width, Height);
-			win_x = Width;
-			win_y = Height;
+			UpdateMouseMatrix();
 		}
 
 		private void OnRenderFrame(object sender, FrameEventArgs frameEventArgs)
@@ -449,6 +454,16 @@ namespace Project1
 					_solverEnvironment.Solver = new VerletSolver();
 					UpdateHeader();
 					break;
+
+				case Key.F1:
+					InitSystem(CreateParticleScene);
+					break;
+				case Key.F2:
+					InitSystem(CreateCloth);
+					break;
+				case Key.F3:
+					InitSystem(CreateHair);
+					break;
 			}
 		}
 
@@ -466,7 +481,7 @@ namespace Project1
 			dump_frames = false;
 			frame_number = 0;
 
-			InitSystem();
+			InitSystem(CreateParticleScene);
 
 			this.Load += OnLoad;
 			this.Resize += OnResize;
