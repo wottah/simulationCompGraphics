@@ -48,6 +48,8 @@ namespace Project1
             set { _forceAccumulator = value; }
         }
 
+		public HyperPoint<float> Color { get; set; } 
+
 		public float Massa
 		{
 			get { return _massa; }
@@ -62,6 +64,7 @@ namespace Project1
 
 		public Particle(HyperPoint<float> constructPos, float massa = 1f)
 		{
+			Color = new HyperPoint<float>(1, 1, 1);
 			_constructPos = constructPos;
 			_forceAccumulator = new HyperPoint<float>(0, 0);
 			_massa = massa;
@@ -77,8 +80,8 @@ namespace Project1
 
 		public void Draw(List<Particle> particles)
 		{
-			const double h = 0.03;
-			GL.Color3(1f, 1f, 1f);
+			const double h = 0.1;
+			GLMath2.Color3(Color);
 			GL.Begin(BeginMode.Quads);  
 			GL.Vertex2(_position[0] - h / 2.0, _position[1] - h / 2.0);
 			GL.Vertex2(_position[0] + h / 2.0, _position[1] - h / 2.0);

@@ -19,8 +19,8 @@ namespace Project1
 			float d;
 			if (args.Length == 0)
 			{
-				N = 1;
-				dt = 0.001f;
+				N = 100;
+				dt = 0.005f;
 				d = 5.0f;
 				
 			}

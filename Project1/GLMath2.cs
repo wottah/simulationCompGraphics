@@ -13,5 +13,10 @@ namespace Project1
 		{
 			GL.Vertex2(p.X, p.Y);
 		}
+
+		public static void Color3(HyperPoint<float> p)
+		{
+			GL.Color3(p.R, p.G, p.B);
+		}
 	}
 }
