@@ -11,7 +11,7 @@ namespace Project1
 		/// <summary>
 		/// Calculate the force
 		/// </summary>
-		void CalculateForce();
+		void CalculateForce(List<Particle> particles);
 	}
 
 	public interface IDrawable
@@ -19,21 +19,21 @@ namespace Project1
 		/// <summary>
 		/// draw the force if neccesary
 		/// </summary>
-		void Draw();
+		void Draw(List<Particle> particles);
 	}
 
 	public struct ResultingConstraint
 	{
-		public Particle Particle;
+		public int ParticleIndex;
 		public HyperPoint<float> Constraint;
 	}
 
 	public interface IConstraint
 	{
-		float Calculate();
-		float CalculateTD();
-		List<ResultingConstraint> CalculateQD();
-		List<ResultingConstraint> CalculateQDTD();
+		float Calculate(List<Particle> particles);
+		float CalculateTD(List<Particle> particles);
+		List<ResultingConstraint> CalculateQD(List<Particle> particles);
+		List<ResultingConstraint> CalculateQDTD(List<Particle> particles);
 	}
 
 	interface IDrawableForce : IDrawable, IForce

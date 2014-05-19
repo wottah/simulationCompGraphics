@@ -9,24 +9,24 @@ namespace Project1
 {
     class MouseSpringForce : IDrawableForce
     {
-        private  Particle _p1;
-		private  Particle _p2;
+        private int _p1;
+		private HyperPoint<float> _mousePos;
 		private readonly float _r;
         private readonly float _ks;
         private readonly float _kd;
         private bool _isEnabled;
 
-        public MouseSpringForce(Particle p1, HyperPoint<float> mousePos, float r, float ks, float kd, bool isEnabled)
+        public MouseSpringForce(int p1, HyperPoint<float> mousePos, float r, float ks, float kd, bool isEnabled)
 		{
 			_p1 = p1;
-			_p2 = new Particle(mousePos);
+			_mousePos = mousePos;
 			_r = r;
 			_ks = ks;
 			_kd = kd;
             _isEnabled = isEnabled;
 		}
 
-        public Particle Particle
+        public int Particle
         {
             get { return _p1; }
             set { _p1 = value; }
@@ -34,8 +34,8 @@ namespace Project1
 
         public HyperPoint<float> MousePos
         {
-            get { return _p2.Position; }
-            set { _p2.Position = value; }
+			get { return _mousePos; }
+			set { _mousePos = value; }
         }
 
         public void Enable()
@@ -48,30 +48,30 @@ namespace Project1
             _isEnabled = false;
         }
 
-		public void Draw()
+		public void Draw(List<Particle> particles)
 		{
             if (_isEnabled)
             {
                 GL.Begin(BeginMode.Lines);
                 GL.Color3(0.8f, 0.7f, 0.6f);
-                GL.Vertex2(_p1.Position[0], _p1.Position[1]);
+				GL.Vertex2(particles[_p1].Position[0], particles[_p1].Position[1]);
                 GL.Color3(0.8f, 0.7f, 0.6f);
-                GL.Vertex2(_p2.Position[0], _p2.Position[1]);
+				GL.Vertex2(_mousePos[0], _mousePos[1]);
                 GL.End();
             }
 		}
 
-        public void CalculateForce()
+		public void CalculateForce(List<Particle> particles)
         {
             if (_isEnabled)
             {
-                HyperPoint<float> _l = _p1.Position - _p2.Position;
-                HyperPoint<float> _lDot = _p1.Velocity - _p2.Velocity;
+				HyperPoint<float> _l = particles[_p1].Position - _mousePos;
+	            HyperPoint<float> _lDot = particles[_p1].Velocity - new HyperPoint<float>(0, 0);
                 float _lAbs = _l.GetLength();
                 if (_lAbs != 0)
                 {
                     HyperPoint<float> _springforce = (_l / _lAbs) * ((_lAbs - _r) * _ks + (HyperPoint<float>.DotProduct(_lDot, _l) / _lAbs) * _kd);
-                    _p1.ForceAccumulator -= _springforce;
+					particles[_p1].ForceAccumulator -= _springforce;
                 }
             }
            

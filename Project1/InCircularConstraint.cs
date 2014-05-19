@@ -9,18 +9,18 @@ namespace Project1
 {
 	class InCircularConstraint : IDrawableConstraint
 	{
-		private readonly Particle _p;
+		private readonly int _p;
 		private readonly HyperPoint<float> _center;
 		private readonly float _radius;
 
-		public InCircularConstraint(Particle p, HyperPoint<float> center, float radius)
+		public InCircularConstraint(int p, HyperPoint<float> center, float radius)
 		{
 			_p = p;
 			_center = center;
 			_radius = radius;
 		}
 
-		public void Draw()
+		public void Draw(List<Particle> particles)
 		{
 			GL.Begin(BeginMode.LineLoop);
 			GL.Color3(0f, 0f, 1f);
@@ -31,20 +31,20 @@ namespace Project1
 			}
 			GL.End();
 		}
-		
-		public bool InRadius()
+
+		public bool InRadius(List<Particle> particles)
 		{
-			HyperPoint<float> translateCenter = _p.Position - _center;
+			HyperPoint<float> translateCenter = particles[_p].Position - _center;
 			return translateCenter.DotProduct(translateCenter) - _radius * _radius < 0;
 		}
 
 		#region Implementation of IConstraint2
 
-		public float Calculate()
+		public float Calculate(List<Particle> particles)
 		{
-			if(InRadius())
+			if (InRadius(particles))
 			{
-				HyperPoint<float> translateCenter = _p.Position - _center;
+				HyperPoint<float> translateCenter = particles[_p].Position - _center;
 				return translateCenter.DotProduct(translateCenter);
 			}
 			else
@@ -53,28 +53,28 @@ namespace Project1
 			}
 		}
 
-		public float CalculateTD()
+		public float CalculateTD(List<Particle> particles)
 		{
-			if (InRadius())
+			if (InRadius(particles))
 			{
 				return 0f;
 			}
 			else
 			{
-				return HyperPoint<float>.DotProduct(2*_p.Position - 2*_center, _p.Velocity);
+				return HyperPoint<float>.DotProduct(2 * particles[_p].Position - 2 * _center, particles[_p].Velocity);
 			}
 		}
 
-		public List<ResultingConstraint> CalculateQD()
+		public List<ResultingConstraint> CalculateQD(List<Particle> particles)
 		{
-			if (InRadius())
+			if (InRadius(particles))
 			{
 				return new List<ResultingConstraint>()
 				       {
 					       new ResultingConstraint()
 						       {
 							       Constraint = new HyperPoint<float>(0, 0),
-								   Particle = _p
+								   ParticleIndex = _p
 						       }
 				       };
 			}
@@ -84,24 +84,24 @@ namespace Project1
 				       {
 					       new ResultingConstraint()
 						       {
-							       Constraint = 2*_p.Position - 2*_center,
-								   Particle = _p
+							       Constraint = 2*particles[_p].Position - 2*_center,
+								   ParticleIndex = _p
 						       }
 				       };
 			}
 			
 		}
 
-		public List<ResultingConstraint> CalculateQDTD()
+		public List<ResultingConstraint> CalculateQDTD(List<Particle> particles)
 		{
-			if (InRadius())
+			if (InRadius(particles))
 			{
 				return new List<ResultingConstraint>()
 					       {
 						       new ResultingConstraint()
 							       {
 								       Constraint = new HyperPoint<float>(0, 0),
-								       Particle = _p
+								       ParticleIndex = _p
 							       }
 					       };
 			}
@@ -111,8 +111,8 @@ namespace Project1
 					       {
 						       new ResultingConstraint()
 							       {
-								       Constraint = 2*_p.Velocity,
-								       Particle = _p
+								       Constraint = 2*particles[_p].Velocity,
+								       ParticleIndex = _p
 							       }
 					       };
 			}

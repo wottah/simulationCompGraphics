@@ -9,10 +9,10 @@ namespace Project1
 {
 	class GravityForce : IDrawableForce
 	{
-		private readonly List<Particle> _particles;
+		private readonly List<int> _particles;
 		private readonly HyperPoint<float> _g;
 
-		public GravityForce(List<Particle> particles, HyperPoint<float> g)
+		public GravityForce(List<int> particles, HyperPoint<float> g)
 		{
 			_particles = particles;
 			_g = g;
@@ -20,12 +20,13 @@ namespace Project1
 
 		#region Implementation of IDrawable
 
-		public void Draw()
+		public void Draw(List<Particle> particles)
 		{
 			
 			GL.Begin(BeginMode.Lines);
-			foreach (Particle p in _particles)
+			foreach (int pIndex in _particles)
 			{
+				Particle p = particles[pIndex];
 				GL.Color3(0.8f, 0.7f, 0.6f);
 				GLMath2.Vertex2(p.Position);
 				GL.Color3(0.8f, 0.7f, 0.6f);
@@ -41,9 +42,9 @@ namespace Project1
 		/// <summary>
 		/// Calculate the force
 		/// </summary>
-		public void CalculateForce()
+		public void CalculateForce(List<Particle> particles)
 		{
-			_particles.ForEach(x => x.ForceAccumulator += _g);
+			_particles.ForEach(x => particles[x].ForceAccumulator += _g);
 		}
 
 		#endregion

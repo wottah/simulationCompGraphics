@@ -7,10 +7,10 @@ namespace Project1
 {
 	class ViscousDragForce: IForce
 	{
-		private readonly List<Particle> _particles;
+		private readonly List<int> _particles;
 		private readonly float _drag;
 
-		public ViscousDragForce(List<Particle> particles, float drag)
+		public ViscousDragForce(List<int> particles, float drag)
 		{
 			_particles = particles;
 			_drag = drag;
@@ -21,9 +21,9 @@ namespace Project1
 		/// <summary>
 		/// Calculate the force
 		/// </summary>
-		public void CalculateForce()
+		public void CalculateForce(List<Particle> particles)
 		{
-			_particles.ForEach(x => x.ForceAccumulator -= _drag*x.Velocity);
+			_particles.ForEach(x => particles[x].ForceAccumulator -= _drag * particles[x].Velocity);
 		}
 
 		#endregion

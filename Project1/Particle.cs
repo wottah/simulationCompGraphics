@@ -75,7 +75,7 @@ namespace Project1
 			_forceConstraint = new HyperPoint<float>(0, 0);
 		}
 
-		public void Draw()
+		public void Draw(List<Particle> particles)
 		{
 			const double h = 0.03;
 			GL.Color3(1f, 1f, 1f);
@@ -85,6 +85,19 @@ namespace Project1
 			GL.Vertex2(_position[0] + h / 2.0, _position[1] + h / 2.0);
 			GL.Vertex2(_position[0] - h / 2.0, _position[1] + h / 2.0);
 			GL.End();
+		}
+
+		public Particle Clone()
+		{
+			Particle p = new Particle(_constructPos, _massa)
+				             {
+					             _forceAccumulator = _forceAccumulator,
+					             _position = _position,
+					             _velocity = _velocity,
+					             _forceConstraint = _forceConstraint,
+					             _index = _index
+				             };
+			return p;
 		}
 	}
 }

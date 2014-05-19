@@ -10,16 +10,16 @@ namespace Project1
 	
 	class HorizontalWireConstraint : IDrawableConstraint
 	{
-		private readonly Particle _p;
+		private readonly int _p;
         private readonly float _linepos;
 
-        public HorizontalWireConstraint(Particle p, float linepos)
+        public HorizontalWireConstraint(int p, float linepos)
 		{
             _p = p;
             _linepos = linepos;
 		}
 
-		public void Draw()
+		public void Draw(List<Particle> particles)
 		{
             GL.Begin(BeginMode.Lines);
             GL.Color3(0.8f, 0.7f, 0.6f);
@@ -31,36 +31,36 @@ namespace Project1
 
 		#region Implementation of IConstraint2
 
-		public float Calculate()
+		public float Calculate(List<Particle> particles)
 		{
-            return _p.Position.Y - _linepos;
+			return particles[_p].Position.Y - _linepos;
 		}
 
-		public float CalculateTD()
+		public float CalculateTD(List<Particle> particles)
 		{
-            return _p.Velocity.Y;
+			return particles[_p].Velocity.Y;
 		}
 
-		public List<ResultingConstraint> CalculateQD()
+		public List<ResultingConstraint> CalculateQD(List<Particle> particles)
 		{
 			return new List<ResultingConstraint>()
 				       {
 					       new ResultingConstraint()
 						       {
 							       Constraint = new HyperPoint<float>(0,1),
-								   Particle = _p
+								   ParticleIndex = _p
 						       }
 				       };
 		}
 
-		public List<ResultingConstraint> CalculateQDTD()
+		public List<ResultingConstraint> CalculateQDTD(List<Particle> particles)
 		{
 			return new List<ResultingConstraint>()
 				       {
 					       new ResultingConstraint()
 						       {
 							       Constraint = new HyperPoint<float>(0,0),
-								   Particle = _p
+								   ParticleIndex = _p
 						       }
 				       };
 		}
