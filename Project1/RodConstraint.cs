@@ -33,18 +33,15 @@ namespace Project1
 
 		public float Calculate(List<Particle> particles)
 		{
-			float x = particles[_p1].Position.X - particles[_p2].Position.X;
-			float y = particles[_p2].Position.Y - particles[_p2].Position.Y;
-			return x*x + y*y - _dist*_dist;
+			HyperPoint<float> distanceVector = particles[_p1].Position - particles[_p2].Position;
+			return distanceVector.DotProduct(distanceVector) - _dist * _dist;
 		}
 
 		public float CalculateTD(List<Particle> particles)
 		{
-			float x = particles[_p1].Position.X - particles[_p2].Position.X;
-			float y = particles[_p1].Position.Y - particles[_p2].Position.Y;
-			float xDot = particles[_p1].Velocity.X - particles[_p2].Velocity.X;
-			float yDot = particles[_p1].Velocity.Y - particles[_p2].Velocity.Y;
-			return 2*x*xDot + 2*y*yDot;
+			HyperPoint<float> distanceVector = particles[_p1].Position - particles[_p2].Position;
+			HyperPoint<float> distanceVelocityVector = particles[_p1].Velocity - particles[_p2].Velocity;
+			return 2 * HyperPoint<float>.DotProduct(distanceVector, distanceVelocityVector);
 		}
 
 		public List<ResultingConstraint> CalculateQD(List<Particle> particles)

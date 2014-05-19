@@ -10,7 +10,7 @@ namespace Project1
 	{
 		public const int MaxSteps = 100;
 
-		public static float ConjGrad(int n, Matrix<float> A, out HyperPoint<float> x, HyperPoint<float> b, float epsilon, ref int steps)
+		public static float ConjGrad(int n, Matrix<float> A, out HyperPoint<float> x, HyperPoint<float> b, float epsilon, int steps)
 		{
 			int i, iMax;
 			float alpha, beta, rSqrLen, rSqrLenOld, u;
@@ -30,10 +30,10 @@ namespace Project1
 
 			d = r;
 
-			i = 0;
 			iMax = steps != 0 ? steps : MaxSteps;
+			i = 0;
 
-			if(rSqrLen < epsilon)
+			if(rSqrLen > epsilon)
 			{
 				while (i< iMax)
 				{
@@ -72,7 +72,9 @@ namespace Project1
 
 					// Converged! Let's get out of here
 					if(rSqrLen <= epsilon)
+					{
 						break;
+					}
 
 					// Change direction: d = r + beta * d
 					beta = rSqrLen / rSqrLenOld;
@@ -80,7 +82,6 @@ namespace Project1
 					d = d + r;
 				}
 			}
-
 			steps = i;
 			return rSqrLen;
 		}

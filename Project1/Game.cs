@@ -84,16 +84,20 @@ namespace Project1
 			AddParticle(new Particle(new HyperPoint<float>(1f, 0)) { Color = new HyperPoint<float>(0, 0, 1) });
 			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)) { Color = new HyperPoint<float>(0, 1, 1) });
 			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
+			AddParticle(new Particle(new HyperPoint<float>(0, 1f)));
+			AddParticle(new Particle(new HyperPoint<float>(0, 0.75f)));
 
 			List<int> particleIndexes = particles.ConvertAll(x => x.Index);
 
 			Add(new SpringForce(0, 1, 0.5f, 1f, 1));
 			Add(new SpringForce(1, 2, 0.5f, 1f, 1));
 			Add(new ViscousDragForce(particleIndexes, 0.4f));
-			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -0.1f)));
+			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -10f)));
 
 			Add(new CircularWireConstraint(0, new HyperPoint<float>(0f, 0f), 1));
 			Add(new CircularWireConstraint(1, new HyperPoint<float>(0.3f, 0f), 0.5f));
+			Add(new HorizontalWireConstraint(3, 1f));
+			Add(new RodConstraint(3, 4, 0.25f));
 		}
 
 		private void CreateCloth()
@@ -172,7 +176,7 @@ namespace Project1
 		{
 			double beta = Math.PI/2;
 			HyperPoint<float> startPosition = new HyperPoint<float>(0, 1f);
-			HyperPoint<float> unitSize = new HyperPoint<float>(0, -0.05f);
+			HyperPoint<float> unitSize = new HyperPoint<float>(0, -0.1f);
 			HyperPoint<float> diffLeftRight = new HyperPoint<float>(Convert.ToSingle(Math.Cos(beta/2)*unitSize.GetLength()), 0f);
 			float springDist = Convert.ToSingle(2*unitSize.GetLength()*Math.Sin(beta));
 			int particleCount = 10;
@@ -186,7 +190,7 @@ namespace Project1
 
 			for (int i = 0; i < particleCount-2; i++)
 			{
-				SpringForce sp = new SpringForce(i, i + 2, springDist, 1, 1);
+				SpringForce sp = new SpringForce(i, i + 2, springDist, 50, 50);
 				Add(sp);
 			}
 			for (int i = 0; i < particleCount - 1; i++)
@@ -439,6 +443,10 @@ namespace Project1
 					break;
 				case Key.Number3:
 					_solverEnvironment.Solver = new RKSolver();
+					UpdateHeader();
+					break;
+				case Key.Number4:
+					_solverEnvironment.Solver = new VerletSolver();
 					UpdateHeader();
 					break;
 			}

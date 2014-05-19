@@ -48,6 +48,11 @@ namespace Project1
             set { _forceAccumulator = value; }
         }
 
+		public HyperPoint<float> ForceComplete
+		{
+			get { return (_forceAccumulator + _forceConstraint)/2; }
+		} 
+
 		public HyperPoint<float> Color { get; set; }
 
 		public float Size { get; set; }
