@@ -75,18 +75,22 @@ namespace Project1
 			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
 			AddParticle(new Particle(new HyperPoint<float>(0, 1f)));
 			AddParticle(new Particle(new HyperPoint<float>(0, 0.75f)));
+			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.75f)));
+			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.50f)));
 
 			List<int> particleIndexes = particles.ConvertAll(x => x.Index);
 
 			Add(new SpringForce(0, 1, 0.5f, 1f, 1));
 			Add(new SpringForce(1, 2, 0.5f, 1f, 1));
 			Add(new ViscousDragForce(particleIndexes, 0.4f));
-			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -10f)));
+			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -9.8f)));
 
 			Add(new CircularWireConstraint(0, new HyperPoint<float>(0f, 0f), 1));
 			Add(new CircularWireConstraint(1, new HyperPoint<float>(0.3f, 0f), 0.5f));
 			Add(new HorizontalWireConstraint(3, 1f));
 			Add(new RodConstraint(3, 4, 0.25f));
+			Add(new CircularWireConstraint(5, new HyperPoint<float>(0.25f, 0.75f), 0));
+			//Add(new MaxRodConstraint(5, 6, 1f));
 		}
 
 		private void CreateCloth()
@@ -127,12 +131,12 @@ namespace Project1
 					if (i > 0)
 					{
 						Add(new SpringForce(_p.Index, clothmesh[i - 1][j].Index, dist, 50f, 1f));
-						Add(new RodConstraint(_p.Index, clothmesh[i - 1][j].Index, dist*tc));
+						Add(new RodConstraint(_p.Index, clothmesh[i - 1][j].Index, dist * tc));
 					}
 					if (j > 0)
 					{
 						Add(new SpringForce(_p.Index, clothmesh[i][j - 1].Index, dist, 50f, 1f));
-						Add(new RodConstraint(_p.Index, clothmesh[i][j - 1].Index, dist*tc));
+						Add(new RodConstraint(_p.Index, clothmesh[i][j - 1].Index, dist * tc));
 					}
 					//shear?
 					if (j > 0)
@@ -140,12 +144,12 @@ namespace Project1
 						if (i > 0)
 						{
 							Add(new SpringForce(_p.Index, clothmesh[i - 1][j - 1].Index, sheardist, 30, 1f));
-							Add(new RodConstraint(_p.Index, clothmesh[i - 1][j - 1].Index, sheardist*tc));
+							Add(new RodConstraint(_p.Index, clothmesh[i - 1][j - 1].Index, sheardist * tc));
 						}
 						if (i < clothwidth - 1)
 						{
 							Add(new SpringForce(_p.Index, clothmesh[i + 1][j - 1].Index, sheardist, 30, 1f));
-							Add(new RodConstraint(_p.Index, clothmesh[i + 1][j - 1].Index, sheardist*tc));
+							Add(new RodConstraint(_p.Index, clothmesh[i + 1][j - 1].Index, sheardist * tc));
 						}
 					}
 
@@ -167,23 +171,33 @@ namespace Project1
 		{
 			systemName = "Hair";
 
-			double beta = Math.PI/2;
+			double beta = Math.PI/4;
 			HyperPoint<float> startPosition = new HyperPoint<float>(0, 1f);
-			HyperPoint<float> unitSize = new HyperPoint<float>(0, -0.2f);
-			HyperPoint<float> diffLeftRight = new HyperPoint<float>(Convert.ToSingle(Math.Cos(beta/2)*unitSize.GetLength()), 0f);
+			HyperPoint<float> unitSize = new HyperPoint<float>(0, -0.1f);
+
+			float stepRight = Convert.ToSingle(Math.Cos(beta/2)*unitSize.GetLength());
+			float stepDown = -Convert.ToSingle(Math.Sqrt(unitSize.Y*unitSize.Y - stepRight*stepRight));
 			float springDist = Convert.ToSingle(2*unitSize.GetLength()*Math.Sin(beta));
-			int particleCount = 10;
+			int particleCount = 20;
 			List<Particle> hair = new List<Particle>();
 			for (int i = 0; i < particleCount; i++)
 			{
-				Particle p = new Particle(startPosition + i*unitSize);
+				Particle p;
+				if(i % 2 == 0)
+				{
+					p = new Particle(startPosition + new HyperPoint<float>(0, i * stepDown));
+				}
+				else
+				{
+					p = new Particle(startPosition + new HyperPoint<float>(stepRight, i * stepDown));
+				}
 				AddParticle(p);
 				hair.Add(p);
 			}
 
 			for (int i = 0; i < particleCount-2; i++)
 			{
-				SpringForce sp = new SpringForce(i, i + 2, springDist, 5000, 1);
+				SpringForce sp = new SpringForce(i, i + 2, springDist, 1, 1);
 				Add(sp);
 			}
 			for (int i = 0; i < particleCount - 1; i++)
@@ -191,20 +205,8 @@ namespace Project1
 				RodConstraint rc = new RodConstraint(i, i + 1, unitSize.GetLength());
 				Add(rc);
 			}
-			for (int i = 0; i < particleCount; i++)
-			{
-				if(i % 2 == 0)
-				{
-					hair[i].ConstructPos = hair[i].ConstructPos + diffLeftRight/2;
-				}
-				else
-				{
-					hair[i].ConstructPos = hair[i].ConstructPos - diffLeftRight/2;
-				}
-				hair[i].Position = hair[i].ConstructPos;
-			}
 
-			Add(new CircularWireConstraint(hair[0].Index, startPosition, 0));
+			Add(new CircularWireConstraint(hair[0].Index, startPosition-new HyperPoint<float>(0f, -0.1f), 0.1f));
 
 			List<int> particleIndexes = hair.ConvertAll(x => x.Index);
 			Add(new ViscousDragForce(particleIndexes, 1f));
@@ -224,6 +226,21 @@ namespace Project1
 			Matrix<float> mirror = Matrix<float>.Resize(new HyperPoint<float>(1, -1));
 			Matrix<float> virtualScreenSizeMatrix = Matrix<float>.Resize(VirtualScreenSize);
 			mouseTranslation = virtualScreenSizeMatrix * mirror * translate * resize;
+		}
+
+		private void UpdateVirtualScreenSize()
+		{
+			float MinSize = 2f;
+			if (MinSize / Width * Height < MinSize)
+			{
+				VirtualScreenSize = new HyperPoint<float>(MinSize / Height * Width, MinSize);
+			}
+			else
+			{
+				VirtualScreenSize = new HyperPoint<float>(MinSize, MinSize / Width * Height);
+			}
+			
+			UpdateMouseMatrix();
 		}
 
 
@@ -325,9 +342,7 @@ namespace Project1
 			// setup settings, load textures, sounds
 			VSync = VSyncMode.On;
 
-			VirtualScreenSize = new HyperPoint<float>(2, 2);
-
-			UpdateMouseMatrix();
+			UpdateVirtualScreenSize();
 
 			GL.Enable(EnableCap.LineSmooth);
 			GL.Enable(EnableCap.PolygonSmooth);
@@ -335,7 +350,7 @@ namespace Project1
 
 		private void OnResize(object sender, EventArgs eventArgs)
 		{
-			UpdateMouseMatrix();
+			UpdateVirtualScreenSize();
 		}
 
 		private void OnRenderFrame(object sender, FrameEventArgs frameEventArgs)
@@ -353,7 +368,7 @@ namespace Project1
 			{
 				mouseForce.MousePos =
 					((HyperPoint<float>) (mouseTranslation*new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
-				int steps = Math.Max(1, Convert.ToInt32(Math.Round(1 / dt * SpeedUp)));
+				int steps = Math.Max(1, Convert.ToInt32(Math.Round(1 / dt * SpeedUp / 60.0f)));
 				for (int i = 0; i < steps; i++)
 				{
 					_solverEnvironment.SimulationStep(particles, dt);
@@ -481,7 +496,7 @@ namespace Project1
 			dump_frames = false;
 			frame_number = 0;
 
-			InitSystem(CreateParticleScene);
+			InitSystem(CreateHair);
 
 			this.Load += OnLoad;
 			this.Resize += OnResize;

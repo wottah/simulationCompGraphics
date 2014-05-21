@@ -15,7 +15,9 @@ namespace Project1
 		private ParticleSimulation simulation = new ParticleSimulation()
 			                                        {
 				                                        ConstraintsEpsilon = 1/100f,
-														Steps = 10000
+														Steps = 10000,
+														SpringConstant = 100f,
+														SpringDemping = 100f
 			                                        };
 
 		public SolverEnvironment()
@@ -122,64 +124,6 @@ namespace Project1
 			get { return "Runge-Kutta"; }
 		}
 
-		private void BlackBox(List<IForce> forces, List<IConstraint> constraints, List<Particle> particles, float dt)
-		{
-			particles.ForEach(x => x.ForceAccumulator = new HyperPoint<float>(0f, 0f));
-			forces.ForEach(x => x.CalculateForce(particles));
-			DoConstraints(constraints, particles, dt, 100, 100);
-			particles.ForEach(x => x.Velocity += (x.ForceAccumulator + x.ForceConstraint) / x.Massa * dt);
-		}
-
-		private void DoConstraints(List<IConstraint> constraints, List<Particle> particles, float dt, float ks, float kd)
-		{
-			Matrix<float> W = Matrix<float>.Identity(particles.Count * 2);
-			HyperPoint<float> Q = new HyperPoint<float>(particles.Count * 2);
-			HyperPoint<float> q = new HyperPoint<float>(particles.Count * 2);
-			HyperPoint<float> qDot = new HyperPoint<float>(particles.Count * 2);
-			HyperPoint<float> QDak = new HyperPoint<float>(particles.Count * 2);
-			for (int i = 0; i < particles.Count; i++)
-			{
-				q[i * 2 + 0] = particles[i].Position[0];
-				q[i * 2 + 1] = particles[i].Position[1];
-				qDot[i * 2 + 0] = particles[i].Velocity[0];
-				qDot[i * 2 + 1] = particles[i].Velocity[1];
-				W[i * 2 + 0, i * 2 + 0] = 1 / particles[i].Massa;
-				W[i * 2 + 1, i * 2 + 1] = 1 / particles[i].Massa;
-				Q[i * 2 + 0] = particles[i].ForceAccumulator[0];
-				Q[i * 2 + 1] = particles[i].ForceAccumulator[1];
-			}
-
-			HyperPoint<float> c = new HyperPoint<float>(constraints.Count);
-			HyperPoint<float> cDot = new HyperPoint<float>(constraints.Count);
-			for (int i = 0; i < constraints.Count; i++)
-			{
-				c[i] = constraints[i].Calculate(particles);
-				cDot[i] = constraints[i].CalculateTD(particles);
-			}
-
-			Matrix<float> J = JacobianMatrix.Create(particles, constraints);
-			Matrix<float> JDot = JacobianMatrix.CreateDerivative(particles, constraints);
-			Matrix<float> JT = J.Transpose();
-
-			Matrix<float> A = J * W * JT;
-			HyperPoint<float> b1 = (HyperPoint<float>)(-JDot * qDot);
-			Matrix<float> b2Sub = J * W * Q;
-			HyperPoint<float> b2 = (HyperPoint<float>)(b2Sub);
-			HyperPoint<float> b3 = ks * c;
-			HyperPoint<float> b4 = kd * cDot;
-			HyperPoint<float> b = b1 - b2 - b3 - b4;
-			HyperPoint<float> x;
-			LinearSolver.ConjGrad(b.Dim, A, out x, b, 1 / 10f, 0);
-
-			QDak = (HyperPoint<float>)(JT * x);
-
-			for (int i = 0; i < particles.Count; i++)
-			{
-				particles[i].ForceConstraint = new HyperPoint<float>(QDak[i * 2 + 0], QDak[i * 2 + 1]);
-			}
-		}
-
-
 		#endregion
 	}
 
@@ -243,13 +187,16 @@ namespace Project1
 			set { _constraintsEpsilon = value; }
 		}
 
+		public float SpringConstant { get; set; }
+		public float SpringDemping { get; set; }
+
 		public int Steps { get; set; }
 
 		public void Execute(List<Particle> particles, float dt)
 		{
 			particles.ForEach(x => x.ForceAccumulator = new HyperPoint<float>(0f, 0f));
 			Forces.ForEach(x => x.CalculateForce(particles));
-			DoConstraints(Constraints, particles, dt, 100, 100);
+			DoConstraints(Constraints, particles, dt, SpringConstant, SpringDemping);
 			particles.ForEach(x => x.Velocity += (x.ForceAccumulator + x.ForceConstraint) / x.Massa * dt);
 		}
 
