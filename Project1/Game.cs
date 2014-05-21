@@ -95,7 +95,9 @@ namespace Project1
 
 			float dist = 0.3f;
 			float tc = 1.1f;
+            float rodlength = (dist*tc)/2;
 			float sheardist = (float) Math.Sqrt(2*(dist*dist));
+            float shearRodLength = (sheardist * tc) / 2;
 			int clothwidth = 8;
 			int clothheigth = clothwidth;
 			HyperPoint<float> offsetx = new HyperPoint<float>(dist, 0.0f);
@@ -127,12 +129,12 @@ namespace Project1
 					if (i > 0)
 					{
 						Add(new SpringForce(_p.Index, clothmesh[i - 1][j].Index, dist, 50f, 1f));
-						Add(new RodConstraint(_p.Index, clothmesh[i - 1][j].Index, dist*tc));
+                        AddClothRods(_p, clothmesh[i - 1][j], rodlength);
 					}
 					if (j > 0)
 					{
 						Add(new SpringForce(_p.Index, clothmesh[i][j - 1].Index, dist, 50f, 1f));
-						Add(new RodConstraint(_p.Index, clothmesh[i][j - 1].Index, dist*tc));
+                        AddClothRods(_p, clothmesh[i][j - 1], rodlength);
 					}
 					//shear?
 					if (j > 0)
@@ -140,12 +142,12 @@ namespace Project1
 						if (i > 0)
 						{
 							Add(new SpringForce(_p.Index, clothmesh[i - 1][j - 1].Index, sheardist, 30, 1f));
-							Add(new RodConstraint(_p.Index, clothmesh[i - 1][j - 1].Index, sheardist*tc));
+                            AddClothRods(_p, clothmesh[i - 1][j - 1], shearRodLength);
 						}
 						if (i < clothwidth - 1)
 						{
 							Add(new SpringForce(_p.Index, clothmesh[i + 1][j - 1].Index, sheardist, 30, 1f));
-							Add(new RodConstraint(_p.Index, clothmesh[i + 1][j - 1].Index, sheardist*tc));
+                            AddClothRods(_p, clothmesh[i + 1][j - 1], shearRodLength);
 						}
 					}
 
@@ -162,6 +164,14 @@ namespace Project1
 			                                 clothmesh[0][0].Position.Y));
 			Add(new HorizontalWireConstraint(clothmesh[clothmesh.Count - 1][0].Index, clothmesh[0][0].Position.Y));
 		}
+
+        private void AddClothRods(Particle parta, Particle partb, float rodLength)
+        {
+            Particle _rodp = new Particle(parta.Position, float.Epsilon);
+            AddParticle(_rodp);
+            Add(new RodConstraint(parta.Index, _rodp.Index, rodLength));
+            Add(new RodConstraint(_rodp.Index, parta.Index, rodLength));
+        }
 
 		private void CreateHair()
 		{
