@@ -70,33 +70,27 @@ namespace Project1
 		{
 			systemName = "Particle";
 
-			//AddParticle(new Particle(new HyperPoint<float>(1f, 0)) { Color = new HyperPoint<float>(0, 0, 1) });
-			//AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)) { Color = new HyperPoint<float>(0, 1, 1) });
-			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
-			//AddParticle(new Particle(new HyperPoint<float>(0, 1f)));
-			//AddParticle(new Particle(new HyperPoint<float>(0, 0.75f)));
-			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.75f)));
-			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.50f)));
+			AddParticle(new Particle(new HyperPoint<float>(1f, 0)) { Color = new HyperPoint<float>(0, 0, 1) });
+			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)) { Color = new HyperPoint<float>(0, 1, 1) });
+			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
+			AddParticle(new Particle(new HyperPoint<float>(0, 1f)));
+			AddParticle(new Particle(new HyperPoint<float>(0, 0.75f)));
+			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.65f)));
+			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.50f)));
 
-			//List<int> particleIndexes = particles.ConvertAll(x => x.Index);
-
-			//Add(new SpringForce(0, 1, 0.5f, 1f, 1));
-			//Add(new SpringForce(1, 2, 0.5f, 1f, 1));
-			//Add(new ViscousDragForce(particleIndexes, 0.4f));
-			//Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -9.8f)));
-
-			//Add(new CircularWireConstraint(0, new HyperPoint<float>(0f, 0f), 1));
-			//Add(new CircularWireConstraint(1, new HyperPoint<float>(0.3f, 0f), 0.5f));
-			//Add(new HorizontalWireConstraint(3, 1f));
-			//Add(new RodConstraint(3, 4, 0.25f));
-			//Add(new CircularWireConstraint(5, new HyperPoint<float>(0.25f, 0.75f), 0.1f));
-			//Add(new MaxRodConstraint(5, 6, 1f));
-
-			AddParticle(new Particle(new HyperPoint<float>(0.15f, 0.75f)));
 			List<int> particleIndexes = particles.ConvertAll(x => x.Index);
+
+			Add(new SpringForce(0, 1, 0.5f, 1f, 1));
+			Add(new SpringForce(1, 2, 0.5f, 1f, 1));
 			Add(new ViscousDragForce(particleIndexes, 0.4f));
 			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -0.1f)));
-			Add(new CircularWireConstraint(0, new HyperPoint<float>(0.25f, 0.75f), 0.1f));
+
+			Add(new CircularWireConstraint(0, new HyperPoint<float>(0f, 0f), 1));
+			Add(new CircularWireConstraint(1, new HyperPoint<float>(0.3f, 0f), 0.5f));
+			Add(new HorizontalWireConstraint(3, 1f));
+			Add(new RodConstraint(3, 4, 0.25f));
+			Add(new CircularWireConstraint(5, new HyperPoint<float>(0.25f, 0.75f), 0.1f));
+			//Add(new MaxRodConstraint(5, 6, 1f));
 		}
 
 		private void CreateCloth()
@@ -230,6 +224,24 @@ namespace Project1
 			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -0.1f)));
 		}
 
+		private void CreateSolarSystem()
+		{
+			systemName = "Solar";
+
+			AddParticle(new Particle(new HyperPoint<float>(0f, 0f)) { Color = new HyperPoint<float>(1, 1, 0), Size = 0.1f, Massa = 1});
+			AddParticle(new Particle(new HyperPoint<float>(1f, 0), new HyperPoint<float>(0, -1f)) { Color = new HyperPoint<float>(0.5f, 0.5f, 1), Size = 0.05f, Massa = 1f});
+			AddParticle(new Particle(new HyperPoint<float>(1.2f, 1f), new HyperPoint<float>(0, -1f)) { Color = new HyperPoint<float>(1, 1, 1), Size = 0.02f, Massa = 1f });
+
+			List<int> particleIndexes = particles.ConvertAll(x => x.Index);
+
+			Add(new PointGravityForce(particleIndexes, 0, new HyperPoint<float>(9f, -1f)));
+			Add(new PointGravityForce(particleIndexes, 1, new HyperPoint<float>(5, -1f)));
+			Add(new PointGravityForce(particleIndexes, 1, new HyperPoint<float>(2, -1f)));
+			//Add(new PointGravityForce(new List<int>() { 1 }, new HyperPoint<float>(0, 0), new HyperPoint<float>(0f, 0f, 0f, 0f, 0f, 0.5f)));
+
+			Add(new PointConstraint(0, new HyperPoint<float>(0, 0)));
+		}
+
 		private void UpdateHeader()
 		{
 			this.Title = string.Format("{3} system (dt={0}, solver={1}, speedup={2})", dt, _solverEnvironment.Solver.Name,
@@ -292,11 +304,11 @@ namespace Project1
 						bmp.UnlockBits(data);
 
 						bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+						string dirName = "snapshots_" + systemName;
+						if (!Directory.Exists(dirName))
+							Directory.CreateDirectory(dirName);
 
-						if (!Directory.Exists("snapshots"))
-							Directory.CreateDirectory("snapshots");
-
-						string filename = string.Format("snapshots/img{0}.png", Convert.ToSingle(frame_number)/FrameInterval);
+						string filename = string.Format(dirName+"/img{0}.png", Convert.ToSingle(frame_number)/FrameInterval);
 						bmp.Save(filename);
 						Console.Out.WriteLine("Output snapshot: {0}", Convert.ToSingle(frame_number)/FrameInterval);
 					}
@@ -385,9 +397,18 @@ namespace Project1
 				mouseForce.MousePos =
 					((HyperPoint<float>) (mouseTranslation*new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
 				int steps = Math.Max(1, Convert.ToInt32(Math.Round(1 / dt * SpeedUp / 60.0f)));
+				if (dump_frames)
+					steps = 1;
 				for (int i = 0; i < steps; i++)
 				{
-					_solverEnvironment.SimulationStep(particles, dt);
+					try
+					{
+						_solverEnvironment.SimulationStep(particles, dt);
+					}
+					catch (NaNException e)
+					{
+						Console.WriteLine(e);
+					}
 				}
 			}
 			else
@@ -448,7 +469,7 @@ namespace Project1
 				case Key.Space:
 					dsim = !dsim;
 					break;
-				
+
 				case Key.Up:
 					dt *= 2;
 					UpdateHeader();
@@ -495,6 +516,9 @@ namespace Project1
 				case Key.F3:
 					InitSystem(CreateHair);
 					break;
+				case Key.F4:
+					InitSystem(CreateSolarSystem);
+					break;
 			}
 		}
 
@@ -512,7 +536,7 @@ namespace Project1
 			dump_frames = false;
 			frame_number = 0;
 
-			InitSystem(CreateParticleScene);
+			InitSystem(CreateSolarSystem);
 
 			this.Load += OnLoad;
 			this.Resize += OnResize;

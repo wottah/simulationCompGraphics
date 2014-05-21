@@ -31,6 +31,8 @@ namespace Project1
 			set { _constructPos = value; }
 		}
 
+		public HyperPoint<float> ConstructVel { get; set; }
+
 		public HyperPoint<float> Position
 		{
 			get { return _position; }
@@ -111,21 +113,34 @@ namespace Project1
 			set { _index = value; }
 		}
 
-		public Particle(HyperPoint<float> constructPos, float massa = 1f)
+		public Particle(HyperPoint<float> constructPos, float massa = 1f )
 		{
 			Size = 0.03f;
 			Color = new HyperPoint<float>(1, 1, 1);
 			_constructPos = constructPos;
+			ConstructVel = new HyperPoint<float>(0, 0);
 			_forceAccumulator = new HyperPoint<float>(0, 0);
 			_massa = massa;
             _visible = true;
 			reset();
 		}
 
+		public Particle(HyperPoint<float> constructPos, HyperPoint<float> constructVel, float massa = 1f)
+		{
+			Size = 0.03f;
+			Color = new HyperPoint<float>(1, 1, 1);
+			_constructPos = constructPos;
+			ConstructVel = constructVel;
+			_forceAccumulator = new HyperPoint<float>(0, 0);
+			_massa = massa;
+			_visible = true;
+			reset();
+		}
+
 		public void reset()
 		{
 			_position = _constructPos;
-			_velocity = new HyperPoint<float>(0, 0);
+			_velocity = ConstructVel;
 			_forceConstraint = new HyperPoint<float>(0, 0);
 		}
 
