@@ -8,16 +8,11 @@ namespace Project1
 {
 	class JacobianMatrix
 	{
-		public static Matrix<float> Create(List<Particle> particles, List<IConstraint> c)
+		public static ImplicitMatrix<float> Create(List<Particle> particles, List<IConstraint> c)
 		{
-			Matrix<float> output = new Matrix<float>(c.Count, particles.Count*2);
+			ImplicitMatrix<float> output = new ImplicitMatrix<float>(c.Count, particles.Count * 2);
 			for (int i = 0; i < c.Count; i++)
 			{
-				for (int j = 0; j < particles.Count * 2; j++)
-				{
-					output[i, j] = 0;
-				}
-
 				var constraints = c[i].CalculateQD(particles);
 				foreach (ResultingConstraint resultingConstraint in constraints)
 				{
@@ -28,16 +23,11 @@ namespace Project1
 			return output;
 		}
 
-		public static Matrix<float> CreateDerivative(List<Particle> particles, List<IConstraint> c)
+		public static ImplicitMatrix<float> CreateDerivative(List<Particle> particles, List<IConstraint> c)
 		{
-			Matrix<float> output = new Matrix<float>(c.Count, particles.Count * 2);
+			ImplicitMatrix<float> output = new ImplicitMatrix<float>(c.Count, particles.Count * 2);
 			for (int i = 0; i < c.Count; i++)
 			{
-				for (int j = 0; j < particles.Count * 2; j++)
-				{
-					output[i, j] = 0;
-				}
-
 				var constraints = c[i].CalculateQDTD(particles);
 				foreach (ResultingConstraint resultingConstraint in constraints)
 				{

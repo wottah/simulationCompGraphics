@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircularWireConstraint.cs" />
+    <Compile Include="ImplicitMatrix.cs" />
     <Compile Include="MaxRodConstraint.cs" />
     <Compile Include="InCircularConstraint.cs" />
     <Compile Include="HorizontalWireConstraint.cs" />

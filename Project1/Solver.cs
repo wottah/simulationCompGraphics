@@ -202,7 +202,7 @@ namespace Project1
 
 		private void DoConstraints(List<IConstraint> constraints, List<Particle> particles, float dt, float ks, float kd)
 		{
-			Matrix<float> W = Matrix<float>.Identity(particles.Count * 2);
+			ImplicitMatrix<float> W = ImplicitMatrix<float>.Identity(particles.Count * 2);
 			HyperPoint<float> Q = new HyperPoint<float>(particles.Count * 2);
 			HyperPoint<float> q = new HyperPoint<float>(particles.Count * 2);
 			HyperPoint<float> qDot = new HyperPoint<float>(particles.Count * 2);
@@ -227,21 +227,20 @@ namespace Project1
 				cDot[i] = constraints[i].CalculateTD(particles);
 			}
 
-			Matrix<float> J = JacobianMatrix.Create(particles, constraints);
-			Matrix<float> JDot = JacobianMatrix.CreateDerivative(particles, constraints);
-			Matrix<float> JT = J.Transpose();
+			ImplicitMatrix<float> J = JacobianMatrix.Create(particles, constraints);
+			ImplicitMatrix<float> JDot = JacobianMatrix.CreateDerivative(particles, constraints);
+			ImplicitMatrix<float> JT = J.Transpose();
 
-			Matrix<float> A = J * W * JT;
-			HyperPoint<float> b1 = (HyperPoint<float>)(-JDot * qDot);
-			Matrix<float> b2Sub = J * W * Q;
-			HyperPoint<float> b2 = (HyperPoint<float>)(b2Sub);
+			ImplicitMatrix<float> A = J * W * JT;
+			HyperPoint<float> b1 = -JDot * qDot;
+			HyperPoint<float> b2 = J * W * Q;
 			HyperPoint<float> b3 = ks * c;
 			HyperPoint<float> b4 = kd * cDot;
 			HyperPoint<float> b = b1 - b2 - b3 - b4;
 			HyperPoint<float> x;
 			LinearSolver.ConjGrad(b.Dim, A, out x, b, ConstraintsEpsilon, Steps);
 
-			QDak = (HyperPoint<float>)(JT * x);
+			QDak = JT * x;
 
 			for (int i = 0; i < particles.Count; i++)
 			{

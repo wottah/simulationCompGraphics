@@ -10,7 +10,7 @@ namespace Project1
 	{
 		public const int MaxSteps = 100;
 
-		public static float ConjGrad(int n, Matrix<float> A, out HyperPoint<float> x, HyperPoint<float> b, float epsilon, int steps)
+		public static float ConjGrad(int n, ImplicitMatrix<float> A, out HyperPoint<float> x, HyperPoint<float> b, float epsilon, int steps)
 		{
 			int i, iMax;
 			float alpha, beta, rSqrLen, rSqrLenOld, u;
@@ -23,7 +23,7 @@ namespace Project1
 			x = b;
 
 			r = b;
-			temp = (HyperPoint<float>)(A * x);
+			temp = A * x;
 			r = r - temp;
 
 			rSqrLen = r.GetLengthSquared();
@@ -38,7 +38,7 @@ namespace Project1
 				while (i< iMax)
 				{
 					i++;
-					t = (HyperPoint<float>)(A * d);
+					t = A * d;
 					u = HyperPoint<float>.DotProduct(d, t);
 					if(u == 0)
 					{
@@ -63,7 +63,7 @@ namespace Project1
 					{
 						// For stability, correct r every 64th iteration
 						r = b;
-						temp = (HyperPoint<float>)(A * x);
+						temp = A * x;
 						r = r - temp;
 					}
 
