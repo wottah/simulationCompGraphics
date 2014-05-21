@@ -17,6 +17,13 @@ namespace Project1
 		private float _massa;
 		private HyperPoint<float> _forceConstraint;
 		private int _index;
+        private bool _visible;
+
+        public bool Visible
+        {
+            get { return _visible; }
+            set { _visible = value; }
+        }
 
 		public HyperPoint<float> ConstructPos
 		{
@@ -76,6 +83,7 @@ namespace Project1
 			_constructPos = constructPos;
 			_forceAccumulator = new HyperPoint<float>(0, 0);
 			_massa = massa;
+            _visible = true;
 			reset();
 		}
 
@@ -88,13 +96,16 @@ namespace Project1
 
 		public void Draw(List<Particle> particles)
 		{
-			GLMath2.Color3(Color);
-			GL.Begin(BeginMode.Quads);
-			GL.Vertex2(_position[0] - Size / 2.0, _position[1] - Size / 2.0);
-			GL.Vertex2(_position[0] + Size / 2.0, _position[1] - Size / 2.0);
-			GL.Vertex2(_position[0] + Size / 2.0, _position[1] + Size / 2.0);
-			GL.Vertex2(_position[0] - Size / 2.0, _position[1] + Size / 2.0);
-			GL.End();
+            if (_visible)
+            {
+                GLMath2.Color3(Color);
+                GL.Begin(BeginMode.Quads);
+                GL.Vertex2(_position[0] - Size / 2.0, _position[1] - Size / 2.0);
+                GL.Vertex2(_position[0] + Size / 2.0, _position[1] - Size / 2.0);
+                GL.Vertex2(_position[0] + Size / 2.0, _position[1] + Size / 2.0);
+                GL.Vertex2(_position[0] - Size / 2.0, _position[1] + Size / 2.0);
+                GL.End();
+            }
 		}
 
 		public Particle Clone()
