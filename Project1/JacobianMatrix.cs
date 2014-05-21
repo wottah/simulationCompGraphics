@@ -6,6 +6,7 @@ using micfort.GHL.Math2;
 
 namespace Project1
 {
+	
 	class JacobianMatrix
 	{
 		public static ImplicitMatrix<float> Create(List<Particle> particles, List<IConstraint> c)
@@ -16,6 +17,10 @@ namespace Project1
 				var constraints = c[i].CalculateQD(particles);
 				foreach (ResultingConstraint resultingConstraint in constraints)
 				{
+					if (float.IsNaN(resultingConstraint.Constraint[0]) || float.IsNaN(resultingConstraint.Constraint[1]))
+					{
+						throw new NaNException();
+					}
 					output[i, resultingConstraint.ParticleIndex*2 + 0] = resultingConstraint.Constraint[0];
 					output[i, resultingConstraint.ParticleIndex*2 + 1] = resultingConstraint.Constraint[1];
 				}
@@ -31,6 +36,10 @@ namespace Project1
 				var constraints = c[i].CalculateQDTD(particles);
 				foreach (ResultingConstraint resultingConstraint in constraints)
 				{
+					if (float.IsNaN(resultingConstraint.Constraint[0]) || float.IsNaN(resultingConstraint.Constraint[1]))
+					{
+						throw new NaNException();
+					}
 					output[i, resultingConstraint.ParticleIndex*2 + 0] = resultingConstraint.Constraint[0];
 					output[i, resultingConstraint.ParticleIndex*2 + 1] = resultingConstraint.Constraint[1];
 				}

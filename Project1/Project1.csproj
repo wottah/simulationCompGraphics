@@ -63,6 +63,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="GravityForce.cs" />
     <Compile Include="LinearSolver.cs" />
+    <Compile Include="NaNException.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

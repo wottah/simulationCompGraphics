@@ -34,30 +34,65 @@ namespace Project1
 		public HyperPoint<float> Position
 		{
 			get { return _position; }
-			set { _position = value; }
+			set
+			{
+				if (float.IsNaN(value.X) || float.IsNaN(value.Y))
+				{
+					throw new NaNException();
+				}
+				_position = value;
+			}
 		}
 
 		public HyperPoint<float> Velocity
 		{
 			get { return _velocity; }
-			set { _velocity = value; }
+			set
+			{
+				if (float.IsNaN(value.X) || float.IsNaN(value.Y))
+				{
+					throw new NaNException();
+				}
+				_velocity = value;
+			}
 		}
 
 		public HyperPoint<float> ForceConstraint
 		{
 			get { return _forceConstraint; }
-			set { _forceConstraint = value; }
+			set
+			{
+				if (float.IsNaN(value.X) || float.IsNaN(value.Y))
+				{
+					throw new NaNException();
+				}
+				if (value.GetLengthSquared() > 100 * 100)
+				{
+					Console.Out.WriteLine("Large constraint force??");
+				}
+				_forceConstraint = value;
+			}
 		}
 
 		public HyperPoint<float> ForceAccumulator
         {
             get { return _forceAccumulator; }
-            set { _forceAccumulator = value; }
+            set
+            {
+				if (float.IsNaN(value.X) || float.IsNaN(value.Y))
+				{
+					throw new NaNException();
+				}
+	            _forceAccumulator = value;
+            }
         }
 
 		public HyperPoint<float> ForceComplete
 		{
-			get { return (_forceAccumulator + _forceConstraint)/2; }
+			get
+			{
+				return (_forceAccumulator + _forceConstraint)/2;
+			}
 		} 
 
 		public HyperPoint<float> Color { get; set; }

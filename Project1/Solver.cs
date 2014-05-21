@@ -14,10 +14,10 @@ namespace Project1
 
 		private ParticleSimulation simulation = new ParticleSimulation()
 			                                        {
-				                                        ConstraintsEpsilon = 1/100f,
-														Steps = 10000,
-														SpringConstant = 100f,
-														SpringDemping = 100f
+														ConstraintsEpsilon = 1 / 100000000f,
+														Steps = 1000,
+														SpringConstant = 1,
+														SpringDemping = 1
 			                                        };
 
 		public SolverEnvironment()

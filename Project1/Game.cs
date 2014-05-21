@@ -57,7 +57,7 @@ namespace Project1
 			_solverEnvironment = new SolverEnvironment();
 			_solverEnvironment.Solver = new EulerSolver();
 
-			mouseForce = new MouseSpringForce(0, new HyperPoint<float>(1f, 1f), 0.02f, 100f, 1f, false);
+			mouseForce = new MouseSpringForce(0, new HyperPoint<float>(1f, 1f), 0.02f, 2f, 1f, false);
 			Add(mouseForce);
 
 			createSystem();
@@ -70,27 +70,33 @@ namespace Project1
 		{
 			systemName = "Particle";
 
-			AddParticle(new Particle(new HyperPoint<float>(1f, 0)) { Color = new HyperPoint<float>(0, 0, 1) });
-			AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)) { Color = new HyperPoint<float>(0, 1, 1) });
-			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
-			AddParticle(new Particle(new HyperPoint<float>(0, 1f)));
-			AddParticle(new Particle(new HyperPoint<float>(0, 0.75f)));
-			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.75f)));
-			AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.50f)));
+			//AddParticle(new Particle(new HyperPoint<float>(1f, 0)) { Color = new HyperPoint<float>(0, 0, 1) });
+			//AddParticle(new Particle(new HyperPoint<float>(0.8f, 0)) { Color = new HyperPoint<float>(0, 1, 1) });
+			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0)) { Color = new HyperPoint<float>(1, 0, 1) });
+			//AddParticle(new Particle(new HyperPoint<float>(0, 1f)));
+			//AddParticle(new Particle(new HyperPoint<float>(0, 0.75f)));
+			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.75f)));
+			//AddParticle(new Particle(new HyperPoint<float>(0.25f, 0.50f)));
 
-			List<int> particleIndexes = particles.ConvertAll(x => x.Index);
+			//List<int> particleIndexes = particles.ConvertAll(x => x.Index);
 
-			Add(new SpringForce(0, 1, 0.5f, 1f, 1));
-			Add(new SpringForce(1, 2, 0.5f, 1f, 1));
-			Add(new ViscousDragForce(particleIndexes, 0.4f));
-			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -9.8f)));
+			//Add(new SpringForce(0, 1, 0.5f, 1f, 1));
+			//Add(new SpringForce(1, 2, 0.5f, 1f, 1));
+			//Add(new ViscousDragForce(particleIndexes, 0.4f));
+			//Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -9.8f)));
 
-			Add(new CircularWireConstraint(0, new HyperPoint<float>(0f, 0f), 1));
-			Add(new CircularWireConstraint(1, new HyperPoint<float>(0.3f, 0f), 0.5f));
-			Add(new HorizontalWireConstraint(3, 1f));
-			Add(new RodConstraint(3, 4, 0.25f));
-			Add(new CircularWireConstraint(5, new HyperPoint<float>(0.25f, 0.75f), 0));
+			//Add(new CircularWireConstraint(0, new HyperPoint<float>(0f, 0f), 1));
+			//Add(new CircularWireConstraint(1, new HyperPoint<float>(0.3f, 0f), 0.5f));
+			//Add(new HorizontalWireConstraint(3, 1f));
+			//Add(new RodConstraint(3, 4, 0.25f));
+			//Add(new CircularWireConstraint(5, new HyperPoint<float>(0.25f, 0.75f), 0.1f));
 			//Add(new MaxRodConstraint(5, 6, 1f));
+
+			AddParticle(new Particle(new HyperPoint<float>(0.15f, 0.75f)));
+			List<int> particleIndexes = particles.ConvertAll(x => x.Index);
+			Add(new ViscousDragForce(particleIndexes, 0.4f));
+			Add(new GravityForce(particleIndexes, new HyperPoint<float>(0, -0.1f)));
+			Add(new CircularWireConstraint(0, new HyperPoint<float>(0.25f, 0.75f), 0.1f));
 		}
 
 		private void CreateCloth()
@@ -98,11 +104,11 @@ namespace Project1
 			systemName = "Cloth";
 
 			float dist = 0.3f;
-			float tc = 1.1f;
+			float tc = 1.0f;
             float rodlength = (dist*tc)/2;
 			float sheardist = (float) Math.Sqrt(2*(dist*dist));
             float shearRodLength = (sheardist * tc) / 2;
-			int clothwidth = 8;
+			int clothwidth = 5;
 			int clothheigth = clothwidth;
 			HyperPoint<float> offsetx = new HyperPoint<float>(dist, 0.0f);
 			HyperPoint<float> offsety = new HyperPoint<float>(0.0f, -dist);
@@ -146,12 +152,12 @@ namespace Project1
 						if (i > 0)
 						{
 							Add(new SpringForce(_p.Index, clothmesh[i - 1][j - 1].Index, sheardist, 30, 1f));
-                            AddClothRods(_p, clothmesh[i - 1][j - 1], shearRodLength);
+							AddClothRods(_p, clothmesh[i - 1][j - 1], shearRodLength);
 						}
 						if (i < clothwidth - 1)
 						{
 							Add(new SpringForce(_p.Index, clothmesh[i + 1][j - 1].Index, sheardist, 30, 1f));
-                            AddClothRods(_p, clothmesh[i + 1][j - 1], shearRodLength);
+							AddClothRods(_p, clothmesh[i + 1][j - 1], shearRodLength);
 						}
 					}
 
@@ -167,14 +173,15 @@ namespace Project1
 			Add(new HorizontalWireConstraint(clothmesh[Convert.ToInt32(Math.Floor((clothmesh.Count - 1)/2f))][0].Index,
 			                                 clothmesh[0][0].Position.Y));
 			Add(new HorizontalWireConstraint(clothmesh[clothmesh.Count - 1][0].Index, clothmesh[0][0].Position.Y));
+			Add(new GravityForce(particles.ConvertAll(x => x.Index), new HyperPoint<float>(0, -0.1f)));
 		}
 
         private void AddClothRods(Particle parta, Particle partb, float rodLength)
         {
-            Particle _rodp = new Particle(parta.Position, float.Epsilon);
-            AddParticle(_rodp);
-            Add(new RodConstraint(parta.Index, _rodp.Index, rodLength));
-            Add(new RodConstraint(_rodp.Index, parta.Index, rodLength));
+			Particle _rodp = new Particle((parta.Position+partb.Position)/2, 1);
+			AddParticle(_rodp);
+			Add(new RodConstraint(parta.Index, _rodp.Index, rodLength));
+			Add(new RodConstraint(_rodp.Index, partb.Index, rodLength));
         }
 
 		private void CreateHair()
@@ -505,7 +512,7 @@ namespace Project1
 			dump_frames = false;
 			frame_number = 0;
 
-			InitSystem(CreateHair);
+			InitSystem(CreateParticleScene);
 
 			this.Load += OnLoad;
 			this.Resize += OnResize;
