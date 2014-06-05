@@ -1,14 +1,18 @@
 \documentclass[11pt,a4paper]{report}
 \usepackage{graphicx,color}
 \usepackage[english]{babel}
-%\usepackage[english]{tuereport2008}
+\IfFileExists{tuereport2008.sty}{\usepackage[english]{tuereport2008}}{}
 
-%\graphicspath{{images/}}
-
-\title{Project 1}
-%\subtitle{}
-\author{}
-%\version{}
+\IfFileExists{tuereport2008.sty}
+{
+    \title{Simulation in computer graphics}
+    \subtitle{Project 1}
+    \author{Michiel Fortuin\\Wouter Boereboom}
+    \version{0.1}
+}{
+    \title{Simulation in computer graphics: project 1}
+    \author{Michiel Fortuin\\Wouter Boereboom}
+}
 %\orderissuer{}
 %\copyholder{}
 %\administrativeunit{}   % insert department name here
