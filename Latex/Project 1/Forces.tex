@@ -1,1 +1,44 @@
 \chapter{Forces}
+
+\section{Gravity force}
+The following formula $\boldsymbol{f}_{grav} = m*\boldsymbol{G}$ is implemented with the following code.
+\begin{lstlisting}
+particles.ForEach(x => x.ForceAccumulator += gravity * x.Massa;
+\end{lstlisting}
+
+\section{Point gravity force}
+A point gravity can be described as $f_{grav} = \boldsymbol{D}*(f(l_{distance})*m_{particle}*m_{center} \max 0)$, where D is the direction to the center, f is a polynomial function and $m_{particle}$ and $m_{center}$ are the masses. This is implemented in the following code (g is the scalers of the polynomial function).
+\begin{lstlisting}
+float distance = (center.Position-p.Position).GetLength();
+if(distance == 0)
+{
+	return new Vector(0, 0);
+}
+float delta = 0;
+for (int i = 0; i < g.Dim; i++)
+{
+	delta += Math.Pow(distance, i) * g[i]);
+}
+Vector direction = (center.Position - p.Position).Normilize();
+return direction * Math.Max(0, delta*p.Massa*center.Massa);
+\end{lstlisting}
+
+\section{Spring force}
+The following formula is used for implementing a spring force $f_{p1} = [{k_s(|\boldsymbol{l}| - r) + k_d \frac{\boldsymbol{\dot{l}}\cdot\boldsymbol{l}}{|\boldsymbol{l}|}}]\frac{1}{|\boldsymbol{l}|}\boldsymbol{l}$ and $f_{p1} -= f_{p2}$.
+\begin{lstlisting}
+Vector l = p1.Position - p2.Position;
+Vector lDot = p1.Velocity - p2.Velocity;
+float lAbs = l.GetLength();
+Vector springforce = (l / lAbs)*((lAbs - _r) * _ks + (Dot(lDot, l) / lAbs) * _kd);
+p1.ForceAccumulator -= springforce;
+p2.ForceAccumulator += springforce;
+\end{lstlisting}
+
+\section{Mouse spring force}
+The mouse spring is the same as a spring force, but only to a constant point(the mouse position) and the force is only 1 sided.
+
+\section{Viscous drag Force}
+The following formula $\boldsymbol{f}_{drag} = -k_{drag}*\boldsymbol{v}$ is implemented with the following code.
+\begin{lstlisting}
+particles.ForEach(x => x.ForceAccumulator -= _drag * x.Velocity);
+\end{lstlisting} 
