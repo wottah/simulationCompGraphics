@@ -1,1 +1,30 @@
 \chapter{Interaction}
+There are several types of user interaction within the simulation which can be put in two categories; interaction that directly influences the simulation (adds forces) and interaction that influences the simulation settings (change timestep, scene, etc.). \\
+
+\smallskip
+The intereaction that directly influences the simulation itself is the mouse interaction. When clicking and dragging on a particle (or its proximity) a spring force will be applied between the current mouse position and the particle. This makes it possible for the user to grab and drag particles around in the simulation. The mouse position is updated in every time step. \\
+
+\smallskip
+The keyboard commands that influence the settings of the simulation as well as the scenes are as follows: \\
+\begin{itemize}
+  \item \textbf{C}: Resets the current scene.
+  \item \textbf{D}: Starts/Stops capturing frames.
+  \item \textbf{Q}: Exit application.
+  \item \textbf{space}: Pause simulation.
+  \item \textbf{Up}: Doubles timestep $(dt=dt*2)$.
+  \item \textbf{Down}: Halves timestep $(dt = dt/2)$.
+  \item \textbf{Left}: halves number of steps skipped. \\ 
+  (increases simulation computational effort) 
+  \item \textbf{Right}: doubles number of steps skipped. \\
+  (decreases computational effort)
+  \item \textbf{1}: Switch to Euler solver.
+  \item \textbf{2}: Switch to Mid-point solver.
+  \item \textbf{3}: Switch to Runge-Kutta solver.
+  \item \textbf{4}: Switch to Verlet solver.
+  \item \textbf{f1}: Switch to simple particle scene.
+  \item \textbf{f2}: Switch to cloth scene.
+  \item \textbf{f3}: Switch to hair scene.
+  \item \textbf{f4}: Switch to solar system scene.
+\end{itemize}
+
+
