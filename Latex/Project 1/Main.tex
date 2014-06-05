@@ -1,7 +1,17 @@
 \documentclass[11pt,a4paper]{report}
 \usepackage{graphicx,color}
 \usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{iftex}
+\usepackage{color}
+\usepackage{listings}
+\ifPDFTeX
+    \usepackage[utf8]{inputenc}
+\fi
+
 \IfFileExists{tuereport2008.sty}{\usepackage[english]{tuereport2008}}{}
+
+\lstset{language=[Sharp]C}
 
 \IfFileExists{tuereport2008.sty}
 {
