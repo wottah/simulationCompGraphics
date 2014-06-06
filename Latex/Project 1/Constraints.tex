@@ -15,8 +15,8 @@ $\boldsymbol{QDTD}= 2*particle.velocity$\\
 A particle cannot leave a horizontal wire. \\
 $C = particle.position.Y -linepos$ \\
 $\dot{C} = particle.velocity.Y$ \\
-$\boldsymbol{QD} =\begin{matrix} 0 \\ 1  \end{matrix}$ \\
-$\boldsymbol{QDTD}=\begin{matrix} 0 \\ 0  \end{matrix}$ \\
+$\boldsymbol{QD} =\begin{pmatrix} \frac{\partial c}{\partial x} \\ \frac{\partial c}{\partial y}  \end{pmatrix}$ \\
+$\boldsymbol{QDTD}=\begin{pmatrix} \frac{\partial\dot{c}}{\partial x} \\ \frac{\partial \dot{c}}{\partial y}  \end{pmatrix}$ \\
 
 \pagebreak
 \textbf{Point constraint} \\
@@ -33,8 +33,8 @@ $C = |\boldsymbol{particle1.position} - \boldsymbol{particle2.position}| - dist^
 $\dot{C} = 2*((\boldsymbol{particle1.position} - \boldsymbol{particle2.position}) \cdot (\boldsymbol{particle1.velocity} - \boldsymbol{particle2.velocity})	) $ \\
 $\boldsymbol{QD} = 2*(particle1.position - particle2.position)$ (for particle 1) \\
 $\boldsymbol{QD} = -2*(particle1.position - particle2.position)$ (for particle 2) \\
-$\boldsymbol{QDTD}= 2*(particle1.velocity - particle2.velocity)$ for particle 1\\
-$\boldsymbol{QDTD}= -2*(particle1.velocity - particle2.velocity)$ for particle 2\\
+$\boldsymbol{QDTD}= 2*(particle1.velocity - particle2.velocity)$ (for particle 1)\\
+$\boldsymbol{QDTD}= -2*(particle1.velocity - particle2.velocity)$ (for particle 2)\\
 
 \smallskip
 note that c is the circle centre and r is the circle radius. Linepos is the Y value of a horizontal line and dist is the length a rod constraint should maintain.
