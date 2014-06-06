@@ -1,5 +1,5 @@
 \chapter{Integration} 
-Every integration scheme uses a blackbox to calculate the forces and constraints, and subsequently the velocity's. 
+Every integration scheme uses a blackbox to calculate the forces and constraints, and subsequently the velocity's.
 
 \section{Euler integration}
 The euler integration is implemented as follows.
@@ -7,26 +7,105 @@ The euler integration is implemented as follows.
 blackbox.Execute(particles, dt);
 particles.ForEach(x => x.Position += x.Velocity * dt);
 \end{lstlisting}
-Which implements the following formula $q = \dot{q}*\delta t$.
+Which implements the following formula $q = \dot{q}*\Delta t$.
 
 \section{Mid Point integration}
+The midpoint integration scheme is implemented as follows
+
 \begin{lstlisting}
-			List<Particle> particlesCopy = particles.ConvertAll(x => x.Clone());
+//Copy system to keep the original position
+List<Particle> particlesCopy = particles.Copy();
 
-			//first calculate midpoint
-			bb.Execute(particlesCopy, dt);
-			particlesCopy.ForEach(x => x.Position += x.Velocity * (dt/2));
+//first calculate midpoint
+blackbox.Execute(particlesCopy, dt);
+particlesCopy.ForEach(x => x.Position += x.Velocity * (dt/2));
 
-			//calculate forces on midpoint
-			bb.Execute(particlesCopy, dt);
+//calculate forces on midpoint
+blackbox.Execute(particlesCopy, dt);
 
-			for (int i = 0; i < particles.Count; i++)
-			{
-				particles[i].Velocity = particlesCopy[i].Velocity;
-				particles[i].Position += particlesCopy[i].Velocity*dt;
-			}
+for (int i = 0; i < particles.Count; i++)
+{
+	particles[i].Velocity = particlesCopy[i].Velocity;
+	particles[i].Position += particlesCopy[i].Velocity*dt;
+}
 \end{lstlisting}
 
 \section{Runge Kutta integration}
+The following code implements the runga kutta integration scheme of order 4. These scheme is described in formule \ref{formula:RK41} through \ref{formula:RK45}.
+
+\begin{lstlisting}
+//copy system for to keep original positions
+List<Particle> k1 = particles.ConvertAll(x => x.Clone());
+List<Particle> k2 = particles.ConvertAll(x => x.Clone());
+List<Particle> k3 = particles.ConvertAll(x => x.Clone());
+List<Particle> k4 = particles.ConvertAll(x => x.Clone());
+
+blackbox.Execute(k1, dt);
+
+for (int i = 0; i < particles.Count; i++)
+{
+	k2[i].Velocity = k1[i].Velocity;
+	k2[i].Position += k1[i].Velocity * dt;
+}
+
+blackbox.Execute(k2, dt/2);
+
+for (int i = 0; i < particles.Count; i++)
+{
+	k3[i].Velocity = k2[i].Velocity;
+	k3[i].Position += k2[i].Velocity * dt;
+}
+
+blackbox.Execute(k3, dt);
+
+for (int i = 0; i < particles.Count; i++)
+{
+	k4[i].Velocity = k3[i].Velocity;
+	k4[i].Position += k3[i].Velocity * dt;
+}
+
+blackbox.Execute(k4, dt);
+
+for (int i = 0; i < particles.Count; i++)
+{
+	particles[i].Velocity = k1[i].Velocity/6 + k2[i].Velocity/3 + k3[i].Velocity/3 + k4[i].Velocity/6;
+	particles[i].Position += particles[i].Velocity*dt;
+}
+\end{lstlisting}
+
+\begin{eqnarray}
+\label{formula:RK41}
+k_1 &=& hf(x_0, t_0) \\
+k_2 &=& hf(x_0 + k_1/2, t_0+h/2) \\
+k_3 &=& hf(x_0 + k_2/2, t_0+h/2) \\
+k_4 &=& hf(x_0 + k_3/2, t_0+h) \\
+\label{formula:RK45}
+x(t_0 + h) &=& x_0 + \frac{1}{6}k_1 + \frac{1}{3}k_2 + \frac{1}{3}k_3 + \frac{1}{6}k_4
+\end{eqnarray}
 
 \section{Verlet integration}
+Lastly we implemented the Verlet integration scheme. This is described in the following formula.
+
+\begin{eqnarray*}
+\boldsymbol{x_1} &=& \boldsymbol{x_0} + \boldsymbol{\dot{x_0}}\Delta t + \frac{1}{2} \boldsymbol{\ddot{x_0}}\Delta t^2 \\
+\boldsymbol{x_{n+1}} &=& 2\boldsymbol{x_n} - \boldsymbol{x_{n-1}}\Delta t + \boldsymbol{\ddot{x_0}}\Delta t^2 \
+\end{eqnarray*}
+This is implemented in the following code. Note that \_previousState starts with a null value.
+\begin{lstlisting}
+List<Particle> tmp = particles.ConvertAll(x => x.Clone());
+if (_previousState == null)//first time
+{
+	blackbox.Execute(particles, dt);
+	particles.ForEach(x => x.Position = x.Position + x.Velocity*dt + 0.5f*x.ForceComplete*dt*dt);
+}
+else //after the first time
+{
+	blackbox.Execute(particles, dt);
+	for (int i = 0; i < particles.Count; i++)
+	{
+		particles[i].Position = 2*particles[i].Position - _previousState[i].Position +
+		                        particles[i].ForceComplete*dt*dt;
+	}
+}
+_previousState = tmp;
+\end{lstlisting}
