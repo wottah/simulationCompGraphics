@@ -7,7 +7,7 @@ particles.ForEach(x => x.ForceAccumulator += gravity * x.Massa;
 \end{lstlisting}
 
 \section{Point gravity force}
-A point gravity can be described as $f_{grav} = \boldsymbol{D}*(f(l_{distance})*m_{particle}*m_{center} \max 0)$, where D is the direction to the center, f is a polynomial function and $m_{particle}$ and $m_{center}$ are the masses. This is implemented in the following code (g is the scalers of the polynomial function).
+A point gravity can be described as $f_{grav} = \boldsymbol{D}*(f(l_{distance})*m_{particle}*m_{center} \max 0)$, where D is the direction to the center, f is a polynomial function and $m_{particle}$ and $m_{center}$ are the masses. This is implemented in the following code (g is are scalars of the polynomial function).
 \begin{lstlisting}
 float distance = (center.Position-p.Position).GetLength();
 if(distance == 0)
@@ -41,4 +41,4 @@ The mouse spring is the same as a spring force, but only to a constant point(the
 The following formula $\boldsymbol{f}_{drag} = -k_{drag}*\boldsymbol{v}$ is implemented with the following code.
 \begin{lstlisting}
 particles.ForEach(x => x.ForceAccumulator -= _drag * x.Velocity);
-\end{lstlisting} 
+\end{lstlisting}
