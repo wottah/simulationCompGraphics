@@ -162,3 +162,9 @@ $RECYCLE.BIN/
 #nuget packages
 /packages
 /*.userprefs
+/Latex/Project 1/*.toc
+/Latex/Project 1/*.bak
+/Latex/Project 1/*.bbl
+/Latex/Project 1/*.aux
+/Latex/Project 1/*.synctex
+/Latex/Project 1/*.prj

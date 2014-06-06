@@ -1,7 +1,31 @@
 \chapter{Integration} 
+Every integration scheme uses a blackbox to calculate the forces and constraints, and subsequently the velocity's. 
+
 \section{Euler integration}
+The euler integration is implemented as follows.
+\begin{lstlisting}
+blackbox.Execute(particles, dt);
+particles.ForEach(x => x.Position += x.Velocity * dt);
+\end{lstlisting}
+Which implements the following formula $q = \dot{q}*\delta t$.
 
 \section{Mid Point integration}
+\begin{lstlisting}
+			List<Particle> particlesCopy = particles.ConvertAll(x => x.Clone());
+
+			//first calculate midpoint
+			bb.Execute(particlesCopy, dt);
+			particlesCopy.ForEach(x => x.Position += x.Velocity * (dt/2));
+
+			//calculate forces on midpoint
+			bb.Execute(particlesCopy, dt);
+
+			for (int i = 0; i < particles.Count; i++)
+			{
+				particles[i].Velocity = particlesCopy[i].Velocity;
+				particles[i].Position += particlesCopy[i].Velocity*dt;
+			}
+\end{lstlisting}
 
 \section{Runge Kutta integration}
 
