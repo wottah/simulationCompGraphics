@@ -1,40 +1,40 @@
 \chapter{Constraints}
 A variety of constraints have been implemented into the simulation in order to put limits on particle and force behaviour. Through the implementation of the Jacobian matrix it is possible to enforce several constraints simultaniously. \\
-for each constraint, $C$, $\dot{C}$ and the vectors $\boldsymbol{QD}$ and $\boldsymbol{QDTD}$ which represent $(\frac{\partial c}{\partial x}, \frac{\partial c}{\partial y})$ and $(\frac{\partial\dot{c}}{\partial x}, \frac{\partial \dot{c}}{\partial y})$ respectively are given.  \\ 
+for each constraint, $C$, $\dot{C}$ and the vectors $\begin{pmatrix} \frac{\partial c}{\partial x} \\ \frac{\partial c}{\partial y}  \end{pmatrix}$ and $\begin{pmatrix} \frac{\partial\dot{c}}{\partial x} \\ \frac{\partial \dot{c}}{\partial y}  \end{pmatrix}$.
 
 \smallskip
 \textbf{Circular wire constraint} \\
 This constraint makes sure a particle cannot leave a circle it is constrained to. \\
 $C = |\boldsymbol{particle.position} - \boldsymbol{c}| - r^2$ 
 $\dot{C} =2 * particle.position - 2 * c \cdot particle.velocity$ \\
-$\boldsymbol{QD} = 2*particle.position - 2*c$ \\
-$\boldsymbol{QDTD}= 2*particle.velocity$\\
+$\begin{pmatrix} \frac{\partial c}{\partial x} \\ \frac{\partial c}{\partial y}  \end{pmatrix} = 2*particle.position - 2*c$ \\
+$\begin{pmatrix} \frac{\partial\dot{c}}{\partial x} \\ \frac{\partial \dot{c}}{\partial y}  \end{pmatrix}= 2*particle.velocity$\\
 
 \smallskip
 \textbf{Horizontal wire constraint} \\
 A particle cannot leave a horizontal wire. \\
 $C = particle.position.Y -linepos$ \\
 $\dot{C} = particle.velocity.Y$ \\
-$\boldsymbol{QD} =\begin{pmatrix} \frac{\partial c}{\partial x} \\ \frac{\partial c}{\partial y}  \end{pmatrix}$ \\
-$\boldsymbol{QDTD}=\begin{pmatrix} \frac{\partial\dot{c}}{\partial x} \\ \frac{\partial \dot{c}}{\partial y}  \end{pmatrix}$ \\
+$\begin{pmatrix} \frac{\partial c}{\partial x} \\ \frac{\partial c}{\partial y}  \end{pmatrix} =\begin{pmatrix} 0 \\ 1  \end{pmatrix}$ \\
+$\begin{pmatrix} \frac{\partial\dot{c}}{\partial x} \\ \frac{\partial \dot{c}}{\partial y}  \end{pmatrix}=\begin{pmatrix} 0 \\ 0  \end{pmatrix}$ \\
 
 \pagebreak
 \textbf{Point constraint} \\
 This constraint makes sure a particle cannot leave a specific point.\\
 $C = |\boldsymbol{particle.position} - \boldsymbol{c}|$ \\
 $\dot{C} =2 * particle.position - 2 * c \cdot particle.velocity$ \\
-$\boldsymbol{QD} = 2*particle.position - 2*c$ \\
-$\boldsymbol{QDTD}= 2*particle.velocity$\\
+$\begin{pmatrix} \frac{\partial c}{\partial x} \\ \frac{\partial c}{\partial y}  \end{pmatrix} = 2*particle.position - 2*c$ \\
+$\begin{pmatrix} \frac{\partial\dot{c}}{\partial x} \\ \frac{\partial \dot{c}}{\partial y}  \end{pmatrix}= 2*particle.velocity$\\
 
 \smallskip
 \textbf{Rod constraint} \\
 To enforce a set distance (like a rod) between two particles, a rod constraint is implemented. \\
 $C = |\boldsymbol{particle1.position} - \boldsymbol{particle2.position}| - dist^2$ \\
 $\dot{C} = 2*((\boldsymbol{particle1.position} - \boldsymbol{particle2.position}) \cdot (\boldsymbol{particle1.velocity} - \boldsymbol{particle2.velocity})	) $ \\
-$\boldsymbol{QD} = 2*(particle1.position - particle2.position)$ (for particle 1) \\
-$\boldsymbol{QD} = -2*(particle1.position - particle2.position)$ (for particle 2) \\
-$\boldsymbol{QDTD}= 2*(particle1.velocity - particle2.velocity)$ (for particle 1)\\
-$\boldsymbol{QDTD}= -2*(particle1.velocity - particle2.velocity)$ (for particle 2)\\
+$\begin{pmatrix} \frac{\partial c}{\partial x} \\ \frac{\partial c}{\partial y}  \end{pmatrix} = 2*(particle1.position - particle2.position)$ (for particle 1) \\
+$\begin{pmatrix} \frac{\partial c}{\partial x} \\ \frac{\partial c}{\partial y}  \end{pmatrix} = -2*(particle1.position - particle2.position)$ (for particle 2) \\
+$\begin{pmatrix} \frac{\partial\dot{c}}{\partial x} \\ \frac{\partial \dot{c}}{\partial y}  \end{pmatrix}= 2*(particle1.velocity - particle2.velocity)$ (for particle 1)\\
+$\begin{pmatrix} \frac{\partial\dot{c}}{\partial x} \\ \frac{\partial \dot{c}}{\partial y}  \end{pmatrix} = -2*(particle1.velocity - particle2.velocity)$ (for particle 2)\\
 
 \smallskip
 note that c is the circle centre and r is the circle radius. Linepos is the Y value of a horizontal line and dist is the length a rod constraint should maintain.
