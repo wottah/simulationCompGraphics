@@ -192,8 +192,6 @@ namespace Project2
 					system.CalculateDensity(dt, 0f);
 					system.CalculateVelocity(dt, 0f);
 				}
-
-				Console.WriteLine(new List<HyperPoint<float>>(system.velField).Sum(x => x.GetLength()) + ":" + new List<float>(system.densityField).Sum());
 			}
 			else
 			{
@@ -227,7 +225,8 @@ namespace Project2
 				case Key.Z:
 					int pos = system.sources.Length / 2;
 					system.sources[pos] = 0;
-					system.force[pos] = new HyperPoint<float>(0, 0);
+					system.uForce[pos] = 0;
+					system.vForce[pos] = 0;
 					break;
 			}
 		}
@@ -251,7 +250,8 @@ namespace Project2
 				case Key.Z:
 					int pos = system.sources.Length/2;
 					system.sources[pos] = 100f;
-					system.force[pos] = new HyperPoint<float>(20, 20);
+					system.uForce[pos] = 20;
+					system.vForce[pos] = 20;
 					break;
 
 				case Key.Space:
