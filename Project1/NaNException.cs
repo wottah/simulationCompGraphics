@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Project1
 {
-	internal class NaNException : Exception
+	public class NaNException : Exception
 	{
 		public NaNException()
 		{
