@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Project1;
 using micfort.GHL.Math2;
 using OpenTK.Graphics.OpenGL;
 
@@ -18,9 +19,6 @@ namespace Project2
 	class LiquidSystem: IDrawable
 	{
 		public int N = 64;
-		//public float dt = 0.1f;
-		public float diff = 0.0f;
-		public float visc = 0.0f;
 
 		public float[] u;
 		public float[] v;
@@ -31,6 +29,7 @@ namespace Project2
 		public float[] helpScalers2;
 		public float[] sources;
 		private Visualization _visualization = Visualization.Density;
+		private HyperPoint<float> oldPosition = new HyperPoint<float>(0, 0);
 
 		public Visualization Visualization
 		{
@@ -70,12 +69,53 @@ namespace Project2
 			ClearData();
 		}
 
+		public void UI(HyperPoint<float> position, bool left, bool right, float force, float source)
+		{
+			int i, j, size = (N + 2) * (N + 2);
+
+			for (i = 0; i < size; i++)
+			{
+				uForce[i] = vForce[i] = sources[i] = 0.0f;
+			}
+
+			if (!left && !right) return;
+			
+			//+1 for the first item in the line
+			i = (int)(position.X * N + 1);
+			j = (int)(position.Y * N + 1);
+
+			if (i < 1 || i > N || j < 1 || j > N) return;
+
+			HyperPoint<float> difference = oldPosition - position;
+			if(difference.X != 0f) difference.X = -(difference.X/Math.Abs(difference.X));
+			if(difference.Y != 0f) difference.Y = -(difference.Y/Math.Abs(difference.Y));
+
+			if (float.IsNaN(difference.X)) throw new NaNException();
+			if (float.IsNaN(difference.Y)) throw new NaNException();
+
+			if (left)
+			{
+				uForce[IX(i, j)] = force * difference.X;
+				vForce[IX(i, j)] = force * difference.Y;
+			}
+
+
+			if (right)
+			{
+				sources[IX(i, j)] = source;
+			}
+
+			oldPosition = position;
+		}
+
 		#region Density calculations
 
 		public void AddSource(float dt, float[] x, float[] s)
 		{
 			int size = (N + 2)*(N + 2);
 			for (int i = 0; i < size; i++) x[i] += dt*s[i];
+
+			for (int i = 0; i < size; i++) if(float.IsNaN(x[i])) throw new NaNException();
 		}
 
 		public void Diffuse(float diff, float dt, int b, float[] output, float[] input)
@@ -268,7 +308,7 @@ namespace Project2
 			int i, j;
 			float x, y, h;
 
-			h = 1.0f / (N+2);
+			h = 1.0f / N;
 
 			GL.Color3(1f, 0f, 1f);
 			GL.LineWidth(1.0f);
@@ -277,10 +317,10 @@ namespace Project2
 
 			for (i = 0; i <= N+1; i++)
 			{
-				x = (i + 0.5f) * h;
+				x = (i - 0.5f) * h;
 				for (j = 0; j <= N+1; j++)
 				{
-					y = (j + 0.5f) * h;
+					y = (j - 0.5f) * h;
 
 					GL.Vertex2(x, y);
 					GL.Vertex2(x + u[IX(i, j)], y + v[IX(i, j)]);
@@ -293,10 +333,10 @@ namespace Project2
 			GL.Color3(0.5f, 0.5f, 0.5f);
 			for (i = 0; i <= N; i++)
 			{
-				x = (i + 0.5f) * h;
+				x = (i - 0.5f) * h;
 				for (j = 0; j <= N; j++)
 				{
-					y = (j + 0.5f) * h;
+					y = (j - 0.5f) * h;
 					float quadSize = 0.002f;
 					GL.Vertex2(x - quadSize, y - quadSize);
 					GL.Vertex2(x + quadSize, y - quadSize);
@@ -313,16 +353,16 @@ namespace Project2
 			int i, j;
 			float x, y, h, d00, d01, d10, d11;
 
-			h = 1.0f / (N+2);
+			h = 1.0f / N;
 
 			GL.Begin(PrimitiveType.Quads);
 
 			for (i = 0; i <= N; i++)
 			{
-				x = (i + 0.5f) * h;
+				x = (i - 0.5f) * h;
 				for (j = 0; j <= N; j++)
 				{
-					y = (j + 0.5f) * h;
+					y = (j - 0.5f) * h;
 
 					d00 = densityField[IX(i, j)];
 					d01 = densityField[IX(i, j + 1)];

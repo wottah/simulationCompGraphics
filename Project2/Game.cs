@@ -43,30 +43,6 @@ namespace Project2
 		private void ClearData()
 		{
 			system.ClearData();
-
-			Random rand = new Random();
-
-			for (int i = 0; i < 1000; i++)
-			{
-				system.densityField[system.IX(rand.Next(1, system.N), rand.Next(1, system.N))] = 2;
-			}
-
-			for (int i = 1; i <= system.N; i++)
-			{
-				for (int j = 1; j <= system.N; j++)
-				{
-					system.u[system.IX(i, j)] = Convert.ToSingle(rand.NextDouble() * 0.4 - 0.2);
-					system.v[system.IX(i, j)] = Convert.ToSingle(rand.NextDouble() * 0.4 - 0.2);
-				}
-			}
-
-			//for (int i = 0; i <= system.N; i++)
-			//{
-			//	for (int j = 0; j <= system.N; j++)
-			//	{
-			//		system.vForce[system.IX(i, j)] = -0.01f;
-			//	}
-			//}
 		}
 
 		private void InitSystem()
@@ -212,16 +188,17 @@ namespace Project2
 		{
 			if (dsim)
 			{
-				int steps;
-				//mouseForce.MousePos =
-				//	((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
+				HyperPoint<float> mousePos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
+				
+				int steps;				
 				steps = Math.Max(1, Convert.ToInt32(Math.Round(1 / dt * SpeedUp / 60.0f)));
 				if (dump_frames)
 					steps = 1;
 				for (int i = 0; i < steps; i++)
 				{
+					system.UI(mousePos, Mouse[MouseButton.Left], Mouse[MouseButton.Right], 5.0f, 100.0f);
 					system.CalculateVelocity(dt, 0.0000f);
-					system.CalculateDensity(dt, 0.0000f);
+					system.CalculateDensity(dt, 0.000f);
 					Console.Out.WriteLine(new List<float>(system.densityField).Sum());
 				}
 			}

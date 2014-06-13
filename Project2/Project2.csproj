@@ -57,6 +57,7 @@
     <Compile Include="Interfaces.cs" />
     <Compile Include="LiquidSystem.cs" />
     <Compile Include="MousePointer.cs" />
+    <Compile Include="NaNException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
