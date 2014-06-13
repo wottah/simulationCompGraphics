@@ -22,6 +22,16 @@ namespace Project2
 		public float diff = 0.0f;
 		public float visc = 0.0f;
 
+        public enum resolve { empty, copy, invert };
+        public struct bnd 
+        { 
+            public resolve res;
+            public byte source;
+        }
+
+        public bnd[] bIndexu;
+        public bnd[] bIndexv;
+        public bnd[] bIndexd;
 		public float[] u;
 		public float[] v;
 		public float[] uForce;
@@ -48,10 +58,10 @@ namespace Project2
 				uForce[i] = 0; vForce[i] = 0;
 				densityField[i] = 0f;
 				sources[i] = 0f;
-
 				helpScalers[i] = 0f;
 				helpScalers2[i] = 0f;
 			}
+            FillBoundryIndexes();
 		}
 
 		public void AllocateData()
@@ -63,12 +73,110 @@ namespace Project2
 			vForce = new float[size];
 			densityField = new float[size];
 			sources= new float[size];
+            bIndexu = new bnd[size];
+            bIndexv = new bnd[size];
+            bIndexd = new bnd[size];
 
 			helpScalers = new float[size];
 			helpScalers2 = new float[size];
 
 			ClearData();
 		}
+
+        public void FillBoundryIndexes()
+        {
+            //fill bIndexu (boundary forces on X direction)
+            int i, j;
+            for (i = 0; i <= N+1; i++)
+            {
+                for (j = 0; j <= N+1; j++)
+                {
+                    if (i == 0)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.invert;
+                        bIndexu[IX(i, j)].source = 3;
+                    }
+                    if (i == N + 1)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.invert;
+                        bIndexu[IX(i, j)].source = 1;
+
+                    }
+                    if (j == 0)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.copy;
+                        bIndexu[IX(i, j)].source = 2;
+                    }
+                    if (j == N + 1)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.copy;
+                        bIndexu[IX(i, j)].source = 4;
+
+                    }
+                    else bIndexu[IX(i, j)].res = resolve.empty;
+                }
+            }
+            //fill bIndexv (boundary forces on Y direction)
+            for (i = 0; i <= N + 1; i++)
+            {
+                for (j = 0; j <= N + 1; j++)
+                {
+                    if (j == 0)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.invert;
+                        bIndexu[IX(i, j)].source = 2;
+                    }
+                    if (j == N + 1)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.invert;
+                        bIndexu[IX(i, j)].source = 4;
+
+                    }
+                    if (i == 0)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.copy;
+                        bIndexu[IX(i, j)].source = 3;
+                    }
+                    if (i == N + 1)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.copy;
+                        bIndexu[IX(i, j)].source = 1;
+
+                    }
+                    else bIndexu[IX(i, j)].res = resolve.empty;
+                }
+            }
+            //fillbIndexd (boundary forces on density field)
+            for (i = 0; i <= N + 1; i++)
+            {
+                for (j = 0; j <= N + 1; j++)
+                {
+                    if (j == 0)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.copy;
+                        bIndexu[IX(i, j)].source = 2;
+                    }
+                    if (j == N + 1)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.copy;
+                        bIndexu[IX(i, j)].source = 4;
+
+                    }
+                    if (i == 0)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.copy;
+                        bIndexu[IX(i, j)].source = 3;
+                    }
+                    if (i == N + 1)
+                    {
+                        bIndexu[IX(i, j)].res = resolve.copy;
+                        bIndexu[IX(i, j)].source = 1;
+
+                    }
+                    else bIndexu[IX(i, j)].res = resolve.empty;
+                }
+            }
+        }
 
 		#region Density calculations
 
@@ -159,7 +267,7 @@ namespace Project2
 					v[IX(i, j)] -= 0.5f * N * (helpScalers2[IX(i, j + 1)] - helpScalers2[IX(i, j - 1)]);
 				}
 			}
-			SetBnd(1, u); SetBnd(2, v);
+            SetBnd(bIndexu, u); SetBnd(bIndexu, v);
 		}
 
 		public void CalculateVelocity(float dt, float visc)
@@ -204,17 +312,30 @@ namespace Project2
 
 		#region Boundary conditions
 
-		private void SetBnd(int b, float[] x)
+        private void SetBnd(bnd[] b, float[] x)
 		{
-			int i;
+			int i, j;
 
-			for (i = 1; i <= N; i++)
-			{
-				x[IX(0, i)] = b == 1 ? -x[IX(1, i)] : x[IX(1, i)];
-				x[IX(N + 1, i)] = b == 1 ? -x[IX(N, i)] : x[IX(N, i)];
-				x[IX(i, 0)] = b == 2 ? -x[IX(i, 1)] : x[IX(i, 1)];
-				x[IX(i, N + 1)] = b == 2 ? -x[IX(i, N)] : x[IX(i, N)];
-			}
+            for (i = 0; i <= N + 1; i++)
+            {
+                for (j = 0; j <= N + 1; j++)
+                {
+                    if (b[IX(i, j)].res == resolve.copy)
+                    {
+                        if (b[IX(i, j)].source == 1) x[IX(i, j)] = x[IX(i - 1, j)];
+                        if (b[IX(i, j)].source == 2) x[IX(i, j)] = x[IX(i, j+1)];
+                        if (b[IX(i, j)].source == 3) x[IX(i, j)] = x[IX(i + 1, j)];
+                        if (b[IX(i, j)].source == 4) x[IX(i, j)] = x[IX(i, j-1)];
+                    }
+                    if (b[IX(i, j)].res == resolve.invert)
+                    {
+                        if (b[IX(i, j)].source == 1) x[IX(i, j)] = -x[IX(i - 1, j)];
+                        if (b[IX(i, j)].source == 2) x[IX(i, j)] = -x[IX(i, j + 1)];
+                        if (b[IX(i, j)].source == 3) x[IX(i, j)] = -x[IX(i + 1, j)];
+                        if (b[IX(i, j)].source == 4) x[IX(i, j)] = -x[IX(i, j - 1)];
+                    }
+                }
+            }
 
 			x[IX(0, 0)] = 0.5f*(x[IX(1, 0)] + x[IX(0, 1)]);
 			x[IX(0, N + 1)] = 0.5f*(x[IX(1, N + 1)] + x[IX(0, N)]);
