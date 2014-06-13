@@ -29,6 +29,7 @@ namespace Project2
 		private HyperPoint<float> VirtualScreenSize2;
 
 		private LiquidSystem system;
+		private MousePointer mousePointer;
 
 
 		/*
@@ -80,6 +81,9 @@ namespace Project2
 			system.Visualization = Visualization.Velocity;
 			Add(system);
 
+			mousePointer = new MousePointer();
+			Add(mousePointer);
+
 			ClearData();
 			UpdateHeader();
 		}
@@ -91,11 +95,12 @@ namespace Project2
 
 		private void UpdateMouseMatrix()
 		{
-			Matrix<float> translate = Matrix<float>.Translate(-1, -1);
-			Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f / (Width / 2), 1f / (Height / 2)));
+			Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f / Width, 1f / Height));
+			Matrix<float> virtualScreenResize = Matrix<float>.Resize(VirtualScreenSize2 - VirtualScreenSize1);
+			Matrix<float> translate = Matrix<float>.Translate(VirtualScreenSize1);
 			Matrix<float> mirror = Matrix<float>.Resize(new HyperPoint<float>(1, -1));
-			Matrix<float> virtualScreenSizeMatrix = Matrix<float>.Resize(VirtualScreenSize2);
-			mouseTranslation = virtualScreenSizeMatrix * mirror * translate * resize;
+			Matrix<float> translate2 = Matrix<float>.Translate(0, VirtualScreenSize2.Y + VirtualScreenSize1.Y);
+			mouseTranslation = translate2 * mirror * translate * virtualScreenResize * resize;
 		}
 
 		private void UpdateVirtualScreenSize()
@@ -245,6 +250,11 @@ namespace Project2
 
 		}
 
+		private void OnMouseMove(object sender, MouseMoveEventArgs e)
+		{
+			mousePointer.MousePos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(e.X, e.Y, 1))).GetLowerDim(2);
+		}
+
 		private void OnKeyUp(object sender, KeyboardKeyEventArgs keyboardKeyEventArgs)
 		{
 			switch (keyboardKeyEventArgs.Key)
@@ -339,6 +349,7 @@ namespace Project2
 			this.KeyUp += OnKeyUp;
             this.Mouse.ButtonDown += OnMouseDown;
             this.Mouse.ButtonUp += OnMouseUp;
+			this.Mouse.Move += OnMouseMove;
 		}
     }
 }
