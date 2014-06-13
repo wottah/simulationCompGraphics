@@ -22,7 +22,7 @@ namespace Project2
 				totalSize *= size[i];
 			}
 			_data = new CalculatingUnit<T>[totalSize];
-			_size = size;
+			_size = new HyperPoint<int>(size);
 		}
 		
 		/// <summary>

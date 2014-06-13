@@ -169,6 +169,9 @@ namespace Project2
 			vForce = new float[size];
 			densityField = new float[size];
 			sources= new float[size];
+			bIndexu = new bnd[size];
+			bIndexv = new bnd[size];
+			bIndexd = new bnd[size];
 
 			helpScalers = new float[size];
 			helpScalers2 = new float[size];
