@@ -25,7 +25,8 @@ namespace Project2
 		private List<IDrawable> drawables;
 		private float SpeedUp = 0.25f;
 
-		private HyperPoint<float> VirtualScreenSize;
+		private HyperPoint<float> VirtualScreenSize1;
+		private HyperPoint<float> VirtualScreenSize2;
 
 		private LiquidSystem system;
 
@@ -41,6 +42,30 @@ namespace Project2
 		private void ClearData()
 		{
 			system.ClearData();
+
+			Random rand = new Random();
+
+			for (int i = 0; i < 1000; i++)
+			{
+				system.densityField[system.IX(rand.Next(1, system.N), rand.Next(1, system.N))] = 2;
+			}
+
+			for (int i = 1; i <= system.N; i++)
+			{
+				for (int j = 1; j <= system.N; j++)
+				{
+					system.u[system.IX(i, j)] = Convert.ToSingle(rand.NextDouble() * 0.4 - 0.2);
+					system.v[system.IX(i, j)] = Convert.ToSingle(rand.NextDouble() * 0.4 - 0.2);
+				}
+			}
+
+			//for (int i = 0; i <= system.N; i++)
+			//{
+			//	for (int j = 0; j <= system.N; j++)
+			//	{
+			//		system.vForce[system.IX(i, j)] = -0.01f;
+			//	}
+			//}
 		}
 
 		private void InitSystem()
@@ -52,7 +77,6 @@ namespace Project2
 
 			system = new LiquidSystem();
 			system.AllocateData();
-			system.ClearData();
 			system.Visualization = Visualization.Velocity;
 			Add(system);
 
@@ -70,20 +94,22 @@ namespace Project2
 			Matrix<float> translate = Matrix<float>.Translate(-1, -1);
 			Matrix<float> resize = Matrix<float>.Resize(new HyperPoint<float>(1f / (Width / 2), 1f / (Height / 2)));
 			Matrix<float> mirror = Matrix<float>.Resize(new HyperPoint<float>(1, -1));
-			Matrix<float> virtualScreenSizeMatrix = Matrix<float>.Resize(VirtualScreenSize);
+			Matrix<float> virtualScreenSizeMatrix = Matrix<float>.Resize(VirtualScreenSize2);
 			mouseTranslation = virtualScreenSizeMatrix * mirror * translate * resize;
 		}
 
 		private void UpdateVirtualScreenSize()
 		{
 			float MinSize = 1f;
+			float margin = 0.1f;
+			VirtualScreenSize1 = new HyperPoint<float>(-margin, -margin);
 			if (MinSize / Width * Height < MinSize)
 			{
-				VirtualScreenSize = new HyperPoint<float>(MinSize / Height * Width, MinSize);
+				VirtualScreenSize2 = new HyperPoint<float>(MinSize / Height * Width + margin, MinSize + margin);
 			}
 			else
 			{
-				VirtualScreenSize = new HyperPoint<float>(MinSize, MinSize / Width * Height);
+				VirtualScreenSize2 = new HyperPoint<float>(MinSize + margin, MinSize / Width * Height + margin);
 			}
 			
 			UpdateMouseMatrix();
@@ -98,7 +124,7 @@ namespace Project2
 			GL.Viewport(0, 0, Width, Height);
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadIdentity();
-			GL.Ortho(0, VirtualScreenSize.X, 0, VirtualScreenSize.Y, -1, 1);
+			GL.Ortho(VirtualScreenSize1.X, VirtualScreenSize2.X, VirtualScreenSize1.Y, VirtualScreenSize2.Y, -1, 1);
 			GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 		}
@@ -183,14 +209,15 @@ namespace Project2
 			{
 				int steps;
 				//mouseForce.MousePos =
-				//	((HyperPoint<float>) (mouseTranslation*new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
-				//steps = Math.Max(1, Convert.ToInt32(Math.Round(1 / dt * SpeedUp / 60.0f)));
-				//if (dump_frames)
+				//	((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
+				steps = Math.Max(1, Convert.ToInt32(Math.Round(1 / dt * SpeedUp / 60.0f)));
+				if (dump_frames)
 					steps = 1;
 				for (int i = 0; i < steps; i++)
 				{
-					system.CalculateDensity(dt, 0f);
-					system.CalculateVelocity(dt, 0f);
+					system.CalculateVelocity(dt, 0.0000f);
+					system.CalculateDensity(dt, 0.0000f);
+					Console.Out.WriteLine(new List<float>(system.densityField).Sum());
 				}
 			}
 			else

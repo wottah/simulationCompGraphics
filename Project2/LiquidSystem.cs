@@ -52,26 +52,6 @@ namespace Project2
 				helpScalers[i] = 0f;
 				helpScalers2[i] = 0f;
 			}
-			//densityField[IX(N / 2, N / 2)] = 1;
-			//densityField[IX(1, 1)] = 1;
-			//densityField[IX(1, 2)] = 1;
-			//densityField[IX(2, 2)] = 1;
-			//densityField[IX(3, 3)] = 1;
-			Random rand = new Random();
-
-			for (int i = 0; i < 1000; i++)
-			{
-				densityField[IX(rand.Next(1, N + 1), rand.Next(1, N + 1))] = 1;
-			}
-
-			for (int i = 1; i <= N; i++)
-			{
-				for (int j = 1; j <= N; j++)
-				{
-					u[IX(i, j)] = Convert.ToSingle(rand.NextDouble()*0.4-0.2);
-					v[IX(i, j)] = Convert.ToSingle(rand.NextDouble()*0.4-0.2);
-				}
-			}
 		}
 
 		public void AllocateData()
@@ -125,23 +105,23 @@ namespace Project2
 
 					if (x < 0.5f) x = 0.5f;
 					if (x > N + 0.5f) x = N + 0.5f;
-					i0 = (int) x;
+					i0 = (int)x;
 					i1 = i0 + 1;
 
 					if (y < 0.5f) y = 0.5f;
 					if (y > N + 0.5f) y = N + 0.5f;
-					j0 = (int) y;
+					j0 = (int)y;
 					j1 = j0 + 1;
 
 					s1 = x - i0;
 					s0 = 1 - s1;
 					t1 = y - j0;
 					t0 = 1 - t1;
-					d[IX(i, j)] = s0*(t0*d0[IX(i0, j0)] + t1*d0[IX(i0, j1)]) +
-					              s1*(t0*d0[IX(i1, j0)] + t1*d0[IX(i1, j1)]);
+					d[IX(i, j)] = s0 * (t0 * d0[IX(i0, j0)] + t1 * d0[IX(i0, j1)]) +
+								  s1 * (t0 * d0[IX(i1, j0)] + t1 * d0[IX(i1, j1)]);
 				}
 			}
-			SetBnd(b, densityField);
+			SetBnd(b, d);
 		}
 
 		public void CalculateDensity(float dt, float diff)
@@ -179,8 +159,7 @@ namespace Project2
 					v[IX(i, j)] -= 0.5f * N * (helpScalers2[IX(i, j + 1)] - helpScalers2[IX(i, j - 1)]);
 				}
 			}
-			SetBnd(1, u);
-			SetBnd(2, v);
+			SetBnd(1, u); SetBnd(2, v);
 		}
 
 		public void CalculateVelocity(float dt, float visc)
@@ -189,7 +168,7 @@ namespace Project2
 			AddSource(dt, v, vForce);
 
 			Diffuse(visc, dt, 1, helpScalers, u);
-			Diffuse(visc, dt, 1, helpScalers2, v);
+			Diffuse(visc, dt, 2, helpScalers2, v);
 			Swap(ref helpScalers, ref u);
 			Swap(ref helpScalers2, ref v);
 			Project();
@@ -236,6 +215,7 @@ namespace Project2
 				x[IX(i, 0)] = b == 2 ? -x[IX(i, 1)] : x[IX(i, 1)];
 				x[IX(i, N + 1)] = b == 2 ? -x[IX(i, N)] : x[IX(i, N)];
 			}
+
 			x[IX(0, 0)] = 0.5f*(x[IX(1, 0)] + x[IX(0, 1)]);
 			x[IX(0, N + 1)] = 0.5f*(x[IX(1, N + 1)] + x[IX(0, N)]);
 			x[IX(N + 1, 0)] = 0.5f*(x[IX(N, 0)] + x[IX(N + 1, 1)]);
@@ -247,7 +227,7 @@ namespace Project2
 
 		#region Helper methods
 
-		private int IX(int x, int y)
+		public int IX(int x, int y)
 		{
 			return (x) + (N + 2)*(y);
 		}
@@ -295,15 +275,33 @@ namespace Project2
 
 			GL.Begin(PrimitiveType.Lines);
 
-			for (i = 1; i <= N; i++)
+			for (i = 0; i <= N+1; i++)
 			{
 				x = (i + 0.5f) * h;
-				for (j = 1; j <= N; j++)
+				for (j = 0; j <= N+1; j++)
 				{
 					y = (j + 0.5f) * h;
 
 					GL.Vertex2(x, y);
 					GL.Vertex2(x + u[IX(i, j)], y + v[IX(i, j)]);
+				}
+			}
+
+			GL.End();
+
+			GL.Begin(PrimitiveType.Quads);
+			GL.Color3(0.5f, 0.5f, 0.5f);
+			for (i = 0; i <= N; i++)
+			{
+				x = (i + 0.5f) * h;
+				for (j = 0; j <= N; j++)
+				{
+					y = (j + 0.5f) * h;
+					float quadSize = 0.002f;
+					GL.Vertex2(x - quadSize, y - quadSize);
+					GL.Vertex2(x + quadSize, y - quadSize);
+					GL.Vertex2(x + quadSize, y + quadSize);
+					GL.Vertex2(x - quadSize, y + quadSize);
 				}
 			}
 
