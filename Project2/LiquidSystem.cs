@@ -218,6 +218,12 @@ namespace Project2
 			oldPosition = position;
 		}
 
+		public void SimulationStep(float dt, float diff, float visc)
+		{
+			CalculateVelocity(dt, visc);
+			CalculateDensity(dt, diff);
+		}
+
 		#region Density calculations
 
 		public void AddSource(float dt, float[] x, float[] s)

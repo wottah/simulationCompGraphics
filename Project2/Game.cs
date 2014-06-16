@@ -197,9 +197,8 @@ namespace Project2
 				for (int i = 0; i < steps; i++)
 				{
 					system.UI(mousePos, Mouse[MouseButton.Left], Mouse[MouseButton.Right], 5.0f, 100.0f);
-					system.CalculateVelocity(dt, 0.0000f);
-					system.CalculateDensity(dt, 0.000f);
-					Console.Out.WriteLine(new List<float>(system.densityField).Sum());
+					system.SimulationStep(dt, 0, 0);
+					//Console.Out.WriteLine(new List<float>(system.densityField).Sum());
 				}
 			}
 			else

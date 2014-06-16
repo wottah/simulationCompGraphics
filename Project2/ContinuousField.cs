@@ -7,9 +7,9 @@ using micfort.GHL.Math2;
 
 namespace Project2
 {
-	class ContinuousField<T> where T : System.IComparable<T>
+	class ContinuousField
 	{
-		public CalculatingUnit<T>[] _data;
+		public float[] _data;
 		public HyperPoint<int> _size;
 
 		public ContinuousField(HyperPoint<int> size):this(size.p) { } 
@@ -21,100 +21,71 @@ namespace Project2
 			{
 				totalSize *= size[i];
 			}
-			_data = new CalculatingUnit<T>[totalSize];
+			_data = new float[totalSize];
 			_size = new HyperPoint<int>(size);
 		}
 		
 		/// <summary>
-		/// A copy will be made of the array
+		/// No copy will be made of the data
 		/// </summary>
 		/// <param name="size"></param>
 		/// <param name="data"></param>
-		public ContinuousField(HyperPoint<int> size, T[] data)
+		public ContinuousField(HyperPoint<int> size, float[] data)
 		{
 			_size = size;
-			for (int i = 0; i < data.Length; i++)
-			{
-				_data[i] = data[i];
-			}
+			_data = data;
 		}
 
-		public T GetValue(HyperPoint<float> position)
+		public float GetValue(HyperPoint<float> position)
 		{
 			return GetValue(position.p);
 		}
 
-		public T GetValue(float[] position)
+		public float GetValue(float[] position)
 		{
-			BasicOperationsProvider<float> bop = BasicOperationsProvider<float>.GetBasicOperationsProvider();
-			BasicOperationsProvider<T> bop2 = BasicOperationsProvider<T>.GetBasicOperationsProvider();
-
 			CalculatingUnit<int> i0, j0, i1, j1;
-			CalculatingUnit<float> x, y;
-			CalculatingUnit<T> s0, t0, s1, t1;
-
-			CalculatingUnit<float> half = 0.5f;
+			float x, y, s0, t0, s1, t1;
 
 			x = position[0];
 			y = position[1];
-			if (x < half) x = half;
-			if (x > _size.X + half) x = _size.X + half;
-			i0 = bop.ConvertTo<int>(x);
+			if (x < 0.5f) x = 0.5f;
+			if (x > _size.X + 0.5f) x = _size.X + 0.5f;
+			i0 = (int)x;
 			i1 = i0 + 1;
 
-			if (y < half) y = half;
-			if (y > _size.Y + half) y = _size.Y + half;
-			j0 = bop.ConvertTo<int>(y);
+			if (y < 0.5f) y = 0.5f;
+			if (y > _size.Y + 0.5f) y = _size.Y + 0.5f;
+			j0 = (int)y;
 			j1 = j0 + 1;
 
-			s1 = bop.ConvertTo<T>(x - i0);
-			s0 = bop2.One() - s1;
-			t1 = bop.ConvertTo<T>(y - j0);
-			t0 = bop2.One() - t1;
-			return s0 * (t0 * GetCU(i0, j0) + t1 * GetCU(i0, j1)) +
-				   s1 * (t0 * GetCU(i1, j0) + t1 * GetCU(i1, j1));
+			s1 = x - i0;
+			s0 = 1 - s1;
+			t1 = y - j0;
+			t0 = 1 - t1;
+			return s0 * (t0 * this[i0, j0] + t1 * this[i0, j1]) +
+				   s1 * (t0 * this[i1, j0] + t1 * this[i1, j1]);
 		}
 
-		public T this[HyperPoint<int> position]
+		public float this[HyperPoint<int> position]
 		{
 			get { return this[position.p]; }
 			set { this[position.p] = value; }
 		}
 
-		public T this[params int[] position]
+		public float this[params int[] position]
 		{
 			get { return _data[CalculateIndex(position)]; }
 			set { _data[CalculateIndex(position)] = value; }
 		}
 
-		public T this[HyperPoint<float> position]
+		public float this[HyperPoint<float> position]
 		{
 			get { return GetValue(position); }
 		}
 
-		public T this[params float[] position]
+		public float this[params float[] position]
 		{
 			get { return GetValue(position); }
-		}
-
-		public CalculatingUnit<T> GetCU(HyperPoint<int> position)
-		{
-			return _data[CalculateIndex(position)];
-		}
-
-		public CalculatingUnit<T> GetCU(params int[] position)
-		{
-			return _data[CalculateIndex(position)];
-		}
-
-		public void SetCU(HyperPoint<int> position, CalculatingUnit<T> value)
-		{
-			_data[CalculateIndex(position)] = value;
-		}
-
-		public void SetCU(CalculatingUnit<T> value, params int[] position)
-		{
-			_data[CalculateIndex(position)] = value;
 		}
 		
 		public int CalculateIndex(HyperPoint<int> position)
