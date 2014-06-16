@@ -20,7 +20,7 @@ namespace Project2
 	{
 		public int N = 64;
 
-        public enum resolve { empty, copy, invert };
+        public enum resolve { empty, copy, invert, zero };
         public struct bnd
         {
             public resolve res;
@@ -67,98 +67,99 @@ namespace Project2
 
         public void FillBoundryIndexes()
         {
-            //fill bIndexu (boundary forces on X direction)
-            int i, j;
-            for (i = 0; i <= N + 1; i++)
-            {
-                for (j = 0; j <= N + 1; j++)
-                {
-                    if (i == 0)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.invert;
-                        bIndexu[IX(i, j)].source = 3;
-                    }
-                    if (i == N + 1)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.invert;
-                        bIndexu[IX(i, j)].source = 1;
+			SquareBoundryInternal(0, 0, N+2, N+2);
 
-                    }
-                    if (j == 0)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.copy;
-                        bIndexu[IX(i, j)].source = 2;
-                    }
-                    if (j == N + 1)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.copy;
-                        bIndexu[IX(i, j)].source = 4;
-
-                    }
-                    else bIndexu[IX(i, j)].res = resolve.empty;
-                }
-            }
-            //fill bIndexv (boundary forces on Y direction)
-            for (i = 0; i <= N + 1; i++)
-            {
-                for (j = 0; j <= N + 1; j++)
-                {
-                    if (j == 0)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.invert;
-                        bIndexu[IX(i, j)].source = 2;
-                    }
-                    if (j == N + 1)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.invert;
-                        bIndexu[IX(i, j)].source = 4;
-
-                    }
-                    if (i == 0)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.copy;
-                        bIndexu[IX(i, j)].source = 3;
-                    }
-                    if (i == N + 1)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.copy;
-                        bIndexu[IX(i, j)].source = 1;
-
-                    }
-                    else bIndexu[IX(i, j)].res = resolve.empty;
-                }
-            }
-            //fillbIndexd (boundary forces on density field)
-            for (i = 0; i <= N + 1; i++)
-            {
-                for (j = 0; j <= N + 1; j++)
-                {
-                    if (j == 0)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.copy;
-                        bIndexu[IX(i, j)].source = 2;
-                    }
-                    if (j == N + 1)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.copy;
-                        bIndexu[IX(i, j)].source = 4;
-
-                    }
-                    if (i == 0)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.copy;
-                        bIndexu[IX(i, j)].source = 3;
-                    }
-                    if (i == N + 1)
-                    {
-                        bIndexu[IX(i, j)].res = resolve.copy;
-                        bIndexu[IX(i, j)].source = 1;
-
-                    }
-                    else bIndexu[IX(i, j)].res = resolve.empty;
-                }
-            }
+			SquareBoundry(10, 10, 20, 20, false);
+			SquareBoundryInternal(11, 11, 18, 18);
+			SquareBoundry(30, 40, 10, 10);
+			SquareBoundry(40, 30, 10, 10);
         }
+
+		public void SquareBoundryInternal(int x, int y, int w, int h)
+		{
+			for (int i = 0; i < w; i++)
+			{
+				bIndexu[IX(x + i, y)].res = resolve.copy;
+				bIndexu[IX(x + i, y)].source = 2;
+				bIndexv[IX(x + i, y)].res = resolve.invert;
+				bIndexv[IX(x + i, y)].source = 2;
+				bIndexd[IX(x + i, y)].res = resolve.copy;
+				bIndexd[IX(x + i, y)].source = 2;
+
+				bIndexu[IX(x + i, y + h - 1)].res = resolve.copy;
+				bIndexu[IX(x + i, y + h - 1)].source = 4;
+				bIndexv[IX(x + i, y + h - 1)].res = resolve.invert;
+				bIndexv[IX(x + i, y + h - 1)].source = 4;
+				bIndexd[IX(x + i, y + h - 1)].res = resolve.copy;
+				bIndexd[IX(x + i, y + h - 1)].source = 4;
+			}
+
+			for (int i = 0; i < h; i++)
+			{
+				bIndexu[IX(x, y + i)].res = resolve.invert;
+				bIndexu[IX(x, y + i)].source = 3;
+				bIndexv[IX(x, y + i)].res = resolve.copy;
+				bIndexv[IX(x, y + i)].source = 3;
+				bIndexd[IX(x, y + i)].res = resolve.copy;
+				bIndexd[IX(x, y + i)].source = 3;
+
+				bIndexu[IX(x + w - 1, y + i)].res = resolve.invert;
+				bIndexu[IX(x + w - 1, y + i)].source = 1;
+				bIndexv[IX(x + w - 1, y + i)].res = resolve.copy;
+				bIndexv[IX(x + w - 1, y + i)].source = 1;
+				bIndexd[IX(x + w - 1, y + i)].res = resolve.copy;
+				bIndexd[IX(x + w - 1, y + i)].source = 1;
+			}
+		}
+
+		public void SquareBoundry(int x, int y, int w, int h, bool zeroInternal = true)
+		{
+			if(zeroInternal)
+			{
+				for (int i = 1; i < w - 1; i++)
+				{
+					for (int j = 1; j < h - 1; j++)
+					{
+						bIndexu[IX(x + i, y + j)].res = resolve.zero;
+						bIndexv[IX(x + i, y + j)].res = resolve.zero;
+						bIndexd[IX(x + i, y + j)].res = resolve.zero;
+					}
+				}
+			}
+			for (int i = 0; i < w; i++)
+			{
+				bIndexu[IX(x + i, y)].res = resolve.copy;
+				bIndexu[IX(x + i, y)].source = 4;
+				bIndexv[IX(x + i, y)].res = resolve.invert;
+				bIndexv[IX(x + i, y)].source = 4;
+				bIndexd[IX(x + i, y)].res = resolve.copy;
+				bIndexd[IX(x + i, y)].source = 4;
+
+				bIndexu[IX(x + i, y + h - 1)].res = resolve.copy;
+				bIndexu[IX(x + i, y + h - 1)].source = 2;
+				bIndexv[IX(x + i, y + h - 1)].res = resolve.invert;
+				bIndexv[IX(x + i, y + h - 1)].source = 2;
+				bIndexd[IX(x + i, y + h - 1)].res = resolve.copy;
+				bIndexd[IX(x + i, y + h - 1)].source = 2;
+			}
+
+			for (int i = 0; i < h; i++)
+			{
+				bIndexu[IX(x, y + i)].res = resolve.invert;
+				bIndexu[IX(x, y + i)].source = 1;
+				bIndexv[IX(x, y + i)].res = resolve.copy;
+				bIndexv[IX(x, y + i)].source = 1;
+				bIndexd[IX(x, y + i)].res = resolve.copy;
+				bIndexd[IX(x, y + i)].source = 1;
+
+				bIndexu[IX(x + w - 1, y + i)].res = resolve.invert;
+				bIndexu[IX(x + w - 1, y + i)].source = 3;
+				bIndexv[IX(x + w - 1, y + i)].res = resolve.copy;
+				bIndexv[IX(x + w - 1, y + i)].source = 3;
+				bIndexd[IX(x + w - 1, y + i)].res = resolve.copy;
+				bIndexd[IX(x + w - 1, y + i)].source = 3;
+			}
+		}
 		
         public void AllocateData()
 		{
@@ -382,6 +383,10 @@ namespace Project2
                         if (b[IX(i, j)].source == 3) x[IX(i, j)] = -x[IX(i + 1, j)];
                         if (b[IX(i, j)].source == 4) x[IX(i, j)] = -x[IX(i, j - 1)];
                     }
+					if (b[IX(i, j)].res == resolve.zero)
+					{
+						x[IX(i, j)] = 0;
+					}
                 }
             }
 
@@ -439,7 +444,7 @@ namespace Project2
 
 			h = 1.0f / N;
 
-			GL.Color3(1f, 0f, 1f);
+			
 			GL.LineWidth(1.0f);
 
 			GL.Begin(PrimitiveType.Lines);
@@ -450,7 +455,14 @@ namespace Project2
 				for (j = 0; j <= N+1; j++)
 				{
 					y = (j - 0.5f) * h;
-
+					if (bIndexd[IX(i, j)].res == resolve.empty)
+					{
+						GL.Color3(1f, 0f, 1f);
+					}
+					else
+					{
+						GL.Color3(1f, 0f, 0f);
+					}
 					GL.Vertex2(x, y);
 					GL.Vertex2(x + u[IX(i, j)], y + v[IX(i, j)]);
 				}
@@ -459,13 +471,27 @@ namespace Project2
 			GL.End();
 
 			GL.Begin(PrimitiveType.Quads);
-			GL.Color3(0.5f, 0.5f, 0.5f);
-			for (i = 0; i <= N; i++)
+			
+			for (i = 0; i <= N+1; i++)
 			{
 				x = (i - 0.5f) * h;
-				for (j = 0; j <= N; j++)
+				for (j = 0; j <= N+1; j++)
 				{
 					y = (j - 0.5f) * h;
+
+					if (bIndexd[IX(i, j)].res == resolve.empty)
+					{
+						GL.Color3(0.5f, 0.5f, 0.5f);
+					}
+					else if (bIndexd[IX(i, j)].res == resolve.zero)
+					{
+						GL.Color3(0f, 0f, 1f);
+					}
+					else
+					{
+						GL.Color3(1f, 0f, 0f);
+					}
+
 					float quadSize = 0.002f;
 					GL.Vertex2(x - quadSize, y - quadSize);
 					GL.Vertex2(x + quadSize, y - quadSize);
