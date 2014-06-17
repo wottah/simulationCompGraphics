@@ -30,9 +30,8 @@ namespace Project2
 				bool c = false;
 				for (i = 0, j = nvert - 1; i < nvert; j = i++)
 				{
-					HyperPoint<float> verti = (HyperPoint<float>) (m*_points[i]);
-					HyperPoint<float> vertj = (HyperPoint<float>) (m*_points[j]);
-
+					HyperPoint<float> verti = ConvertToPolygonSpace(_points[i], m);
+					HyperPoint<float> vertj = ConvertToPolygonSpace(_points[j], m);
 
 					if (((verti.Y > p.Y) != (vertj.Y > p.Y)) &&
 					    (p.X < (vertj.X - verti.X)*(p.Y - verti.Y)/(vertj.Y - verti.Y) + verti.X))
@@ -56,14 +55,8 @@ namespace Project2
 	                HyperPoint<float> p1 = _points[i];
 					HyperPoint<float> p2 = _points[(i + 1) % _points.Count];
 
-					p1 = new HyperPoint<float>(p1, 1f);
-					p2 = new HyperPoint<float>(p2, 1f);
-
-	                p1 = (HyperPoint<float>) (m*p1);
-					p2 = (HyperPoint<float>) (m*p2);
-
-	                p1 = p1.GetLowerDim(2);
-					p2 = p2.GetLowerDim(2);
+	                p1 = ConvertToPolygonSpace(p1, m);
+					p2 = ConvertToPolygonSpace(p2, m);
 
 					GLMath2.Vertex2(p1);
 					GLMath2.Vertex2(p2);
@@ -72,6 +65,13 @@ namespace Project2
             }
         }
 
+		private HyperPoint<float> ConvertToPolygonSpace(HyperPoint<float> p, Matrix<float> m)
+		{
+			p = new HyperPoint<float>(p, 1f);
+			p = (HyperPoint<float>)(m * p);
+			p = p.GetLowerDim(2);
+			return p;
+		} 
 
     }
 }
