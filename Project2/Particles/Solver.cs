@@ -38,127 +38,13 @@ namespace Project2.Particles
 		string Name { get; }
 	}
 
-	public class VerletSolver : ISolver
-	{
-		private List<Particle> _previousState = null;
-
-		#region Implementation of ISolver
-
-		public void SimulationStep(IBackBox bb, List<Particle> particles, float dt)
-		{
-			List<Particle> tmp = particles.ConvertAll(x => x.Clone());
-			if (_previousState == null)
-			{
-				bb.Execute(particles, dt);
-				particles.ForEach(x => x.Position = x.Position + x.Velocity*dt + 0.5f*x.ForceComplete*dt*dt);
-			}
-			else
-			{
-				bb.Execute(particles, dt);
-				for (int i = 0; i < particles.Count; i++)
-				{
-					particles[i].Position = 2*particles[i].Position - _previousState[i].Position +
-					                        particles[i].ForceComplete*dt*dt;
-				}
-			}
-			_previousState = tmp;
-		}
-
-		public string Name
-		{
-			get { return "Verlet"; }
-		}
-
-		#endregion
-	}
-
-	public class RKSolver : ISolver
-	{
-		#region Implementation of ISolver
-
-		public void SimulationStep(IBackBox bb, List<Particle> particles, float dt)
-		{
-			List<Particle> k1 = particles.ConvertAll(x => x.Clone());
-			List<Particle> k2 = particles.ConvertAll(x => x.Clone());
-			List<Particle> k3 = particles.ConvertAll(x => x.Clone());
-			List<Particle> k4 = particles.ConvertAll(x => x.Clone());
-
-			bb.Execute(k1, dt);
-
-			for (int i = 0; i < particles.Count; i++)
-			{
-				k2[i].Velocity = k1[i].Velocity;
-				k2[i].Position += k1[i].Velocity * dt / 2;
-			}
-
-			bb.Execute(k2, dt);
-
-			for (int i = 0; i < particles.Count; i++)
-			{
-				k3[i].Velocity = k2[i].Velocity;
-				k3[i].Position += k2[i].Velocity * dt / 2;
-			}
-
-			bb.Execute(k3, dt);
-
-			for (int i = 0; i < particles.Count; i++)
-			{
-				k4[i].Velocity = k3[i].Velocity;
-				k4[i].Position += k3[i].Velocity * dt;
-			}
-
-			bb.Execute(k4, dt);
-
-			for (int i = 0; i < particles.Count; i++)
-			{
-				particles[i].Velocity = k1[i].Velocity/6 + k2[i].Velocity/3 + k3[i].Velocity/3 + k4[i].Velocity/6;
-				particles[i].Position += particles[i].Velocity*dt;
-			}
-		}
-
-		public string Name
-		{
-			get { return "Runge-Kutta"; }
-		}
-
-		#endregion
-	}
-
-	public class MidPointSolver : ISolver
-	{
-		#region Implementation of ISolver
-
-		public void SimulationStep(IBackBox bb, List<Particle> particles, float dt)
-		{
-			List<Particle> particlesCopy = particles.ConvertAll(x => x.Clone());
-
-			//first calculate midpoint
-			bb.Execute(particlesCopy, dt);
-			particlesCopy.ForEach(x => x.Position += x.Velocity * (dt/2));
-
-			//calculate forces on midpoint
-			bb.Execute(particlesCopy, dt);
-
-			for (int i = 0; i < particles.Count; i++)
-			{
-				particles[i].Velocity = particlesCopy[i].Velocity;
-				particles[i].Position += particlesCopy[i].Velocity*dt;
-			}
-		}
-
-		public string Name
-		{
-			get { return "Mid-point"; }
-		}
-		#endregion
-	}
-
 	public class EulerSolver : ISolver
 	{
 		public void SimulationStep(IBackBox bb, List<Particle> particles, float dt)
 		{
 			bb.Execute(particles, dt);
 			particles.ForEach(x => x.Position += x.Velocity * dt);
+			particles.ForEach(x => x.Rotation += x.AngularVelocity*dt);
 		}
 
 		public string Name

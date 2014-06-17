@@ -15,8 +15,10 @@ namespace Project2.Particles
 		private HyperPoint<float> _forceConstraint;
 		private int _index;
         private bool _visible;
+		private float _rotation = Convert.ToSingle(Math.PI/4);
+		private float _angularVelocity = Convert.ToSingle(Math.PI/4/100);
 
-        public bool Visible
+		public bool Visible
         {
             get { return _visible; }
             set { _visible = value; }
@@ -54,6 +56,18 @@ namespace Project2.Particles
 				}
 				_velocity = value;
 			}
+		}
+
+		public float Rotation
+		{
+			get { return _rotation; }
+			set { _rotation = value; }
+		}
+
+		public float AngularVelocity
+		{
+			get { return _angularVelocity; }
+			set { _angularVelocity = value; }
 		}
 
 		public HyperPoint<float> ForceConstraint
@@ -164,8 +178,13 @@ namespace Project2.Particles
 					GL.Color3(1f, 0f, 0f);
 					for (int i = 0; i < Polygon.Count; i++)
 					{
-						GLMath2.Vertex2(Position + Polygon[i]);
-						GLMath2.Vertex2(Position + Polygon[(i + 1) % Polygon.Count]);
+						Matrix<float> m = Matrix<float>.Identity(3);
+						m[0, 0] = Convert.ToSingle(Math.Cos(Rotation)); m[0, 1] = Convert.ToSingle(-Math.Sin(Rotation));
+						m[1, 0] = Convert.ToSingle(Math.Sin(Rotation)); m[1, 1] = Convert.ToSingle(Math.Cos(Rotation));
+						m = Matrix<float>.Translate(Position)*m; 
+						
+						GLMath2.Vertex2(((HyperPoint<float>)(m * new HyperPoint<float>(Polygon[i], 1))).GetLowerDim(2));
+						GLMath2.Vertex2(((HyperPoint<float>)(m * new HyperPoint<float>(Polygon[(i + 1) % Polygon.Count], 1))).GetLowerDim(2));
 					}
 					GL.End();
 				}
