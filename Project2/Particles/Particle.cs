@@ -92,7 +92,9 @@ namespace Project2.Particles
 			{
 				return (_forceAccumulator + _forceConstraint)/2;
 			}
-		} 
+		}
+
+		public List<HyperPoint<float>> Polygon { get; set; } 
 
 		public HyperPoint<float> Color { get; set; }
 
@@ -110,8 +112,9 @@ namespace Project2.Particles
 			set { _index = value; }
 		}
 
-		public Particle(HyperPoint<float> constructPos, float massa = 1f )
+		public Particle(HyperPoint<float> constructPos, float massa = 1f, List<HyperPoint<float>> polygon = null)
 		{
+			Polygon = polygon;
 			Size = 0.01f;
 			Color = new HyperPoint<float>(1, 1, 1);
 			_constructPos = constructPos;
@@ -122,12 +125,13 @@ namespace Project2.Particles
 			reset();
 		}
 
-		public Particle(HyperPoint<float> constructPos, HyperPoint<float> constructVel, float massa = 1f)
+		public Particle(HyperPoint<float> constructPos, HyperPoint<float> constructVel, float massa = 1f, List<HyperPoint<float>> polygon = null)
 		{
 			Size = 0.01f;
 			Color = new HyperPoint<float>(1, 1, 1);
 			_constructPos = constructPos;
 			ConstructVel = constructVel;
+			Polygon = polygon;
 			_forceAccumulator = new HyperPoint<float>(0, 0);
 			_massa = massa;
 			_visible = true;
@@ -152,6 +156,19 @@ namespace Project2.Particles
                 GL.Vertex2(_position[0] + Size / 2.0, _position[1] + Size / 2.0);
                 GL.Vertex2(_position[0] - Size / 2.0, _position[1] + Size / 2.0);
                 GL.End();
+
+				if (Polygon != null)
+				{
+					GL.LineWidth(1.0f);
+					GL.Begin(PrimitiveType.Lines);
+					GL.Color3(1f, 0f, 0f);
+					for (int i = 0; i < Polygon.Count; i++)
+					{
+						GLMath2.Vertex2(Position + Polygon[i]);
+						GLMath2.Vertex2(Position + Polygon[(i + 1) % Polygon.Count]);
+					}
+					GL.End();
+				}
             }
 		}
 

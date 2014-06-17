@@ -12,14 +12,16 @@ namespace Project2.Particles
 		private readonly List<int> _particles;
 		private readonly ContinuousField _uField;
 		private readonly ContinuousField _vField;
-		private readonly float _factor;
+		private readonly ContinuousField _dField;
+		private readonly float _positionFactor;
 
-		public VelocityFieldForce(List<int> particles, ContinuousField uField, ContinuousField vField, float factor )
+		public VelocityFieldForce(List<int> particles, ContinuousField uField, ContinuousField vField, ContinuousField dField, float positionFactor)
 		{
 			_particles = particles;
 			_uField = uField;
 			_vField = vField;
-			_factor = factor;
+			_dField = dField;
+			_positionFactor = positionFactor;
 		}
 
 		#region Implementation of IForce
@@ -31,8 +33,9 @@ namespace Project2.Particles
 		{
 			foreach (int p in _particles)
 			{
-				particles[p].ForceAccumulator += new HyperPoint<float>(_uField[particles[p].Position * _factor],
-																	   _vField[particles[p].Position * _factor]);
+				HyperPoint<float> position = particles[p].Position*_positionFactor;
+				particles[p].ForceAccumulator += new HyperPoint<float>(_uField[position],
+																	   _vField[position]) *  Math.Min(_dField[position], 1.0f);
 			}
 		}
 

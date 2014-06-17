@@ -35,6 +35,7 @@ namespace Project2
 		private SolverEnvironment _solverEnvironment;
 		private ContinuousField _uField;
 		private ContinuousField _vField;
+		private ContinuousField _dField;
 
 
 		/*
@@ -64,15 +65,23 @@ namespace Project2
 
 			liqSystem = new LiquidSystem();
 			liqSystem.AllocateData();
-			liqSystem.Visualization = Visualization.Velocity;
+			liqSystem.Visualization = Visualization.Both;
 			Add(liqSystem);
 
 			_uField = new ContinuousField(liqSystem.N+2, liqSystem.N+2);
 			_vField = new ContinuousField(liqSystem.N+2, liqSystem.N+2);
+			_dField = new ContinuousField(liqSystem.N + 2, liqSystem.N + 2);
 
-			AddParticle(new Particle(new HyperPoint<float>(0.9f, 0.9f)));
+			AddParticle(new Particle(new HyperPoint<float>(0.9f, 0.9f), 1, new List<HyperPoint<float>>()
+				                                                               {
+					                                                               new HyperPoint<float>(0.03f, 0.03f),
+																				   new HyperPoint<float>(-0.03f, 0.03f),
+																				   new HyperPoint<float>(-0.03f, -0.03f),
+																				   new HyperPoint<float>(0.03f, -0.03f),
+				                                                               }));
 
-			_solverEnvironment.Forces.Add(new VelocityFieldForce(particles.ConvertAll(x => x.Index), _uField, _vField, liqSystem.N + 2));
+			_solverEnvironment.Forces.Add(new VelocityFieldForce(particles.ConvertAll(x => x.Index), _uField, _vField, _dField, liqSystem.N + 2));
+			_solverEnvironment.Forces.Add(new ViscousDragForce(particles.ConvertAll(x => x.Index), 0.8f));
 
 			mousePointer = new MousePointer();
 			Add(mousePointer);
@@ -221,9 +230,10 @@ namespace Project2
 				for (int i = 0; i < steps; i++)
 				{
 					liqSystem.UI(mousePos, Mouse[MouseButton.Left], Mouse[MouseButton.Right], 5.0f, 100.0f);
-					liqSystem.SimulationStep(dt, 0, 0);
+					liqSystem.SimulationStep(dt, 0.000f, 0.000f);
 					_uField._data = liqSystem.u;
 					_vField._data = liqSystem.v;
+					_dField._data = liqSystem.densityField;
 					_solverEnvironment.SimulationStep(particles, dt);
 					//Console.Out.WriteLine(new List<float>(liqSystem.densityField).Sum());
 				}
