@@ -128,7 +128,7 @@ namespace Project2.Particles
 
 		public Particle(HyperPoint<float> constructPos, float massa = 1f, List<HyperPoint<float>> polygon = null)
 		{
-			Polygon = polygon;
+			Polygon = new MovingPolygon(polygon);
 			Size = 0.01f;
 			Color = new HyperPoint<float>(1, 1, 1);
 			_constructPos = constructPos;
@@ -145,7 +145,7 @@ namespace Project2.Particles
 			Color = new HyperPoint<float>(1, 1, 1);
 			_constructPos = constructPos;
 			ConstructVel = constructVel;
-			Polygon = polygon;
+			Polygon = new MovingPolygon(polygon);
 			_forceAccumulator = new HyperPoint<float>(0, 0);
 			_massa = massa;
 			_visible = true;
