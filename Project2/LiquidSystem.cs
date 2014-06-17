@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using micfort.GHL.Math2;
 using OpenTK.Graphics.OpenGL;
-using NaNException = Project2.Particles.NaNException;
+using Project2.Particles;
 
 namespace Project2
 {
@@ -160,6 +160,82 @@ namespace Project2
 				bIndexd[IX(x + w - 1, y + i)].source = 3;
 			}
 		}
+
+        public void addBoundries(Particle p)
+        {
+            if (p.Polygon.Points.Count > 0)
+            {
+                float minx, maxx, miny, maxy;
+                List<HyperPoint<float>> points = p.Polygon.Points;
+                minx = points.Min(point => point.X);
+                maxx = points.Max(point => point.X);
+                miny = points.Min(point => point.Y);
+                maxy = points.Max(point => point.Y);
+                int iminx = (int)Math.Floor(minx);
+                int imaxx = (int)Math.Ceiling(maxx);
+                int iminy = (int)Math.Floor(miny);
+                int imaxy = (int)Math.Ceiling(maxy);
+                for (int i = iminx; i <= imaxx; i++)
+                {
+                    for (int j = iminy; j <= imaxy; j++)
+                    {
+                        bool pin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j),p.WorldMatrix);
+                        bool lpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i-1, j),p.WorldMatrix);
+                        bool rpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i+1, j),p.WorldMatrix);
+                        bool apin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j+1),p.WorldMatrix);
+                        bool bpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j-1),p.WorldMatrix);
+                        if (pin)
+                        {
+                            if (lpin && rpin && apin && bpin)
+                            {
+                                bIndexu[IX(i, j)].res = resolve.empty;
+                                bIndexv[IX(i, j)].res = resolve.empty;
+                                bIndexd[IX(i,j)].res = resolve.empty;
+                            }
+                            if (!lpin && rpin && apin && bpin)
+                            {
+                                bIndexu[IX(i, j)].res = resolve.invert;
+                                bIndexu[IX(i, j)].source = 1;
+                                bIndexv[IX(i, j)].res = resolve.copy;
+                                bIndexv[IX(i, j)].source = 1;
+                                bIndexd[IX(i, j)].res = resolve.copy;
+                                bIndexd[IX(i, j)].source = 1;
+                            }
+                            if (lpin && !rpin && apin && bpin)
+                            {
+                                bIndexu[IX(i, j)].res = resolve.invert;
+                                bIndexu[IX(i, j)].source = 3;
+                                bIndexv[IX(i, j)].res = resolve.copy;
+                                bIndexv[IX(i, j)].source = 3;
+                                bIndexd[IX(i, j)].res = resolve.copy;
+                                bIndexd[IX(i, j)].source = 3;
+                            }
+                            if (lpin && rpin && !apin && bpin)
+                            {
+                                bIndexu[IX(i, j)].res = resolve.copy;
+                                bIndexu[IX(i, j)].source = 2;
+                                bIndexv[IX(i, j)].res = resolve.invert;
+                                bIndexv[IX(i, j)].source = 2;
+                                bIndexd[IX(i, j)].res = resolve.copy;
+                                bIndexd[IX(i, j)].source = 2;
+                            }
+                            if (lpin && rpin && apin && !bpin)
+                            {
+                                bIndexu[IX(i, j)].res = resolve.copy;
+                                bIndexu[IX(i, j)].source = 4;
+                                bIndexv[IX(i, j)].res = resolve.invert;
+                                bIndexv[IX(i, j)].source = 4;
+                                bIndexd[IX(i, j)].res = resolve.copy;
+                                bIndexd[IX(i, j)].source = 4;
+                            }
+
+                        }
+                    }
+                }
+
+
+            }
+        }
 		
         public void AllocateData()
 		{
