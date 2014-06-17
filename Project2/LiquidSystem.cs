@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Project1;
 using micfort.GHL.Math2;
 using OpenTK.Graphics.OpenGL;
+using NaNException = Project2.Particles.NaNException;
 
 namespace Project2
 {
@@ -420,7 +420,7 @@ namespace Project2
 		/// <summary>
 		/// draw the force if neccesary
 		/// </summary>
-		public void Draw()
+		public void Draw(List<Particles.Particle> particles)
 		{
 			switch (Visualization)
 			{

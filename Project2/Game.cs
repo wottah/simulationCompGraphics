@@ -7,6 +7,7 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+using Project2.Particles;
 using micfort.GHL.Math2;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
@@ -28,8 +29,12 @@ namespace Project2
 		private HyperPoint<float> VirtualScreenSize1;
 		private HyperPoint<float> VirtualScreenSize2;
 
-		private LiquidSystem system;
+		private LiquidSystem liqSystem;
 		private MousePointer mousePointer;
+		private List<Particle> particles;
+		private SolverEnvironment _solverEnvironment;
+		private ContinuousField _uField;
+		private ContinuousField _vField;
 
 
 		/*
@@ -42,7 +47,8 @@ namespace Project2
 
 		private void ClearData()
 		{
-			system.ClearData();
+			liqSystem.ClearData();
+			particles.ForEach(x => x.reset());
 		}
 
 		private void InitSystem()
@@ -51,11 +57,22 @@ namespace Project2
 			dump_frames = false;
 
 			drawables = new List<IDrawable>();
+			particles = new List<Particle>();
 
-			system = new LiquidSystem();
-			system.AllocateData();
-			system.Visualization = Visualization.Velocity;
-			Add(system);
+			_solverEnvironment = new SolverEnvironment();
+			_solverEnvironment.Solver = new EulerSolver();
+
+			liqSystem = new LiquidSystem();
+			liqSystem.AllocateData();
+			liqSystem.Visualization = Visualization.Velocity;
+			Add(liqSystem);
+
+			_uField = new ContinuousField(liqSystem.N+2, liqSystem.N+2);
+			_vField = new ContinuousField(liqSystem.N+2, liqSystem.N+2);
+
+			AddParticle(new Particle(new HyperPoint<float>(0.9f, 0.9f)));
+
+			_solverEnvironment.Forces.Add(new VelocityFieldForce(particles.ConvertAll(x => x.Index), _uField, _vField, liqSystem.N + 2));
 
 			mousePointer = new MousePointer();
 			Add(mousePointer);
@@ -144,7 +161,7 @@ namespace Project2
 
 		private void DrawDrawables()
 		{
-			drawables.ForEach(x => x.Draw());
+			drawables.ForEach(x => x.Draw(particles));
 		}
 
 		#endregion
@@ -154,6 +171,13 @@ namespace Project2
 		private void Add(IDrawable p)
 		{
 			drawables.Add(p);
+		}
+
+		private void AddParticle(Particle p)
+		{
+			p.Index = particles.Count;
+			particles.Add(p);
+			Add(p);
 		}
 
 		#endregion
@@ -196,9 +220,12 @@ namespace Project2
 					steps = 1;
 				for (int i = 0; i < steps; i++)
 				{
-					system.UI(mousePos, Mouse[MouseButton.Left], Mouse[MouseButton.Right], 5.0f, 100.0f);
-					system.SimulationStep(dt, 0, 0);
-					//Console.Out.WriteLine(new List<float>(system.densityField).Sum());
+					liqSystem.UI(mousePos, Mouse[MouseButton.Left], Mouse[MouseButton.Right], 5.0f, 100.0f);
+					liqSystem.SimulationStep(dt, 0, 0);
+					_uField._data = liqSystem.u;
+					_vField._data = liqSystem.v;
+					_solverEnvironment.SimulationStep(particles, dt);
+					//Console.Out.WriteLine(new List<float>(liqSystem.densityField).Sum());
 				}
 			}
 			else
@@ -233,15 +260,6 @@ namespace Project2
 
 		private void OnKeyUp(object sender, KeyboardKeyEventArgs keyboardKeyEventArgs)
 		{
-			switch (keyboardKeyEventArgs.Key)
-			{
-				case Key.Z:
-					int pos = system.sources.Length / 2;
-					system.sources[pos] = 0;
-					system.uForce[pos] = 0;
-					system.vForce[pos] = 0;
-					break;
-			}
 		}
 
 		private void OnKeyDown(object sender, KeyboardKeyEventArgs keyboardKeyEventArgs)
@@ -258,13 +276,6 @@ namespace Project2
 
 				case Key.Q:
 					Exit();
-					break;
-
-				case Key.Z:
-					int pos = system.sources.Length/2;
-					system.sources[pos] = 100f;
-					system.uForce[pos] = 20;
-					system.vForce[pos] = 20;
 					break;
 
 				case Key.Space:
@@ -292,13 +303,13 @@ namespace Project2
 					break;
 
 				case Key.Number1:
-					system.Visualization = Visualization.Density;
+					liqSystem.Visualization = Visualization.Density;
 					break;
 				case Key.Number2:
-					system.Visualization = Visualization.Velocity;
+					liqSystem.Visualization = Visualization.Velocity;
 					break;
 				case Key.Number3:
-					system.Visualization = Visualization.Both;
+					liqSystem.Visualization = Visualization.Both;
 					break;	
 			}
 		}

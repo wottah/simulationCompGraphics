@@ -99,7 +99,7 @@ namespace Project2
 			int dimSize = 1;
 			for (int i = 0; i < position.Length; i++)
 			{
-				index += position[i] * dimSize;
+				index += Math.Max(Math.Min(position[i], _size[i]-1),0) * dimSize;
 				dimSize *= _size[i];
 			}
 			return index;

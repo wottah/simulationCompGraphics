@@ -79,6 +79,15 @@
     <Compile Include="Interfaces.cs" />
     <Compile Include="LiquidSystem.cs" />
     <Compile Include="MousePointer.cs" />
+    <Compile Include="Particles\GLMath2.cs" />
+    <Compile Include="Particles\ImplicitMatrix.cs" />
+    <Compile Include="Particles\JacobianMatrix.cs" />
+    <Compile Include="Particles\LinearSolver.cs" />
+    <Compile Include="Particles\MouseSpringForce.cs" />
+    <Compile Include="Particles\NaNException.cs" />
+    <Compile Include="Particles\Particle.cs" />
+    <Compile Include="Particles\Solver.cs" />
+    <Compile Include="Particles\VelocityFieldForce.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -86,12 +95,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Project1\Project1.csproj">
-      <Project>{a51d0550-fcf9-4310-b774-4dc802af7900}</Project>
-      <Name>Project1</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

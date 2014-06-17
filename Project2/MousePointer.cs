@@ -22,7 +22,7 @@ namespace Project2
 		/// <summary>
 		/// draw the force if neccesary
 		/// </summary>
-		public void Draw()
+		public void Draw(List<Particles.Particle> particles)
 		{
 			GL.Begin(PrimitiveType.Quads);
 			GL.Color3(0, 1f, 0);
