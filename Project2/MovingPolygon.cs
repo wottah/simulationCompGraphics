@@ -10,7 +10,7 @@ using Project2.Particles;
 
 namespace Project2
 {
-    class MovingPolygon
+	public class MovingPolygon
     {
         private List<HyperPoint<float>> _points;
 
@@ -41,18 +41,16 @@ namespace Project2
 
         public void Draw(Matrix<float> m)
         {
-                if (_points.Count > 0)
+            if (_points.Count > 0)
+            {
+                GL.Begin(PrimitiveType.Lines);
+                for (int i = 0; i < _points.Count; i++)
                 {
-                    GL.LineWidth(1.0f);
-                    GL.Begin(PrimitiveType.Lines);
-                    GL.Color3(1f, 0f, 0f);
-                    for (int i = 0; i < _points.Count; i++)
-                    {
-                        GLMath2.Vertex2((HyperPoint<float>)(m * _points[i]));
-                        GLMath2.Vertex2((HyperPoint<float>)(m * _points[(i + 1) % _points.Count]));
-                    }
-                    GL.End();
+                    GLMath2.Vertex2((HyperPoint<float>)(m * _points[i]));
+                    GLMath2.Vertex2((HyperPoint<float>)(m * _points[(i + 1) % _points.Count]));
                 }
+                GL.End();
+            }
         }
 
 

@@ -108,7 +108,7 @@ namespace Project2.Particles
 			}
 		}
 
-		public List<HyperPoint<float>> Polygon { get; set; } 
+		public MovingPolygon Polygon { get; set; } 
 
 		public HyperPoint<float> Color { get; set; }
 
@@ -173,20 +173,15 @@ namespace Project2.Particles
 
 				if (Polygon != null)
 				{
-					GL.LineWidth(1.0f);
-					GL.Begin(PrimitiveType.Lines);
 					GL.Color3(1f, 0f, 0f);
-					for (int i = 0; i < Polygon.Count; i++)
-					{
-						Matrix<float> m = Matrix<float>.Identity(3);
-						m[0, 0] = Convert.ToSingle(Math.Cos(Rotation)); m[0, 1] = Convert.ToSingle(-Math.Sin(Rotation));
-						m[1, 0] = Convert.ToSingle(Math.Sin(Rotation)); m[1, 1] = Convert.ToSingle(Math.Cos(Rotation));
-						m = Matrix<float>.Translate(Position)*m; 
-						
-						GLMath2.Vertex2(((HyperPoint<float>)(m * new HyperPoint<float>(Polygon[i], 1))).GetLowerDim(2));
-						GLMath2.Vertex2(((HyperPoint<float>)(m * new HyperPoint<float>(Polygon[(i + 1) % Polygon.Count], 1))).GetLowerDim(2));
-					}
-					GL.End();
+					GL.LineWidth(1.0f);
+
+					Matrix<float> m = Matrix<float>.Identity(3);
+					m[0, 0] = Convert.ToSingle(Math.Cos(Rotation)); m[0, 1] = Convert.ToSingle(-Math.Sin(Rotation));
+					m[1, 0] = Convert.ToSingle(Math.Sin(Rotation)); m[1, 1] = Convert.ToSingle(Math.Cos(Rotation));
+					m = Matrix<float>.Translate(Position) * m;
+
+					Polygon.Draw(m);
 				}
             }
 		}
