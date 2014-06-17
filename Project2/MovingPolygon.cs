@@ -13,18 +13,10 @@ namespace Project2
     class MovingPolygon
     {
         private List<HyperPoint<float>> _points;
-        private bool _visible;
 
         public MovingPolygon(List<HyperPoint<float>> points)
         {
             _points = points;
-            _visible = true;
-        }
-
-        public bool Visible
-        {
-            get { return _visible; }
-            set { _visible = value; }
         }
 
         //Tests whether point p is in polygon. ref: http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html 
@@ -49,8 +41,6 @@ namespace Project2
 
         public void Draw(Matrix<float> m)
         {
-            if (_visible)
-            {
                 if (_points.Count > 0)
                 {
                     GL.LineWidth(1.0f);
@@ -63,7 +53,6 @@ namespace Project2
                     }
                     GL.End();
                 }
-            }
         }
 
 
