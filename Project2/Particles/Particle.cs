@@ -17,12 +17,17 @@ namespace Project2.Particles
         private bool _visible;
 		private float _rotation = Convert.ToSingle(Math.PI/4);
 		private float _angularVelocity = Convert.ToSingle(Math.PI/4/100);
-        private Matrix<float> _worldMatrix;
 
         public Matrix<float> WorldMatrix
         {
-            get { return _worldMatrix; }
-            set { _worldMatrix = value; }
+            get
+            {
+				Matrix<float> m = Matrix<float>.Identity(3);
+				m[0, 0] = Convert.ToSingle(Math.Cos(Rotation)); m[0, 1] = Convert.ToSingle(-Math.Sin(Rotation));
+				m[1, 0] = Convert.ToSingle(Math.Sin(Rotation)); m[1, 1] = Convert.ToSingle(Math.Cos(Rotation));
+				m = Matrix<float>.Translate(Position) * m;
+	            return m;
+            }
         }
 
 		public bool Visible
@@ -183,12 +188,7 @@ namespace Project2.Particles
 					GL.Color3(1f, 0f, 0f);
 					GL.LineWidth(1.0f);
 
-					Matrix<float> m = Matrix<float>.Identity(3);
-					m[0, 0] = Convert.ToSingle(Math.Cos(Rotation)); m[0, 1] = Convert.ToSingle(-Math.Sin(Rotation));
-					m[1, 0] = Convert.ToSingle(Math.Sin(Rotation)); m[1, 1] = Convert.ToSingle(Math.Cos(Rotation));
-					m = Matrix<float>.Translate(Position) * m;
-
-					Polygon.Draw(m);
+					Polygon.Draw(WorldMatrix);
 				}
             }
 		}
