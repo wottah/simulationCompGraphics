@@ -119,10 +119,11 @@ namespace Project2.Particles
             }
         }
 
-        public HyperPoint<float> RotatedVelocity()
+        public HyperPoint<float> RotationVelocity(float dt)
         {
-            double cos = Convert.ToSingle(Math.Sin(_angularVelocity));
-            double sin = Convert.ToSingle(Math.Cos(_angularVelocity));
+	        float visje = _angularVelocity*dt;
+			double sin = Convert.ToSingle(Math.Sin(visje));
+			double cos = Convert.ToSingle(Math.Cos(visje));
             double x = Position.X * cos - Position.Y * sin;
             double y = Position.X * sin + Position.Y * cos;
             HyperPoint<float> p = new HyperPoint<float>((float)x,(float)y);

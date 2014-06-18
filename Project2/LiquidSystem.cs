@@ -310,26 +310,41 @@ namespace Project2
 						if (pin)
 						{
 							float forceFactor = 10.0f;
+
+							Matrix<float> rotationNextStep = Matrix<float>.Identity(3);
+							m[0, 0] = Convert.ToSingle(Math.Cos(p.AngularVelocity * dt)); m[0, 1] = Convert.ToSingle(-Math.Sin(p.AngularVelocity * dt));
+							m[1, 0] = Convert.ToSingle(Math.Sin(p.AngularVelocity * dt)); m[1, 1] = Convert.ToSingle(Math.Cos(p.AngularVelocity * dt));
+
+							HyperPoint<float> contactPointInPolygonSpace = new HyperPoint<float>(i/(float) N, j/(float) N) - p.Position;
+
+							HyperPoint<float> velByRotation = contactPointInPolygonSpace.HGMult(rotationNextStep) - contactPointInPolygonSpace;
+							HyperPoint<float> totalVel = velByRotation + p.Velocity;
+							//HyperPoint<float> totalVel = p.Velocity;
+
 							if (!rpin)
 							{
-                                uForce[IX(i - 1, j)] += p.RotatedVelocity(dt).X * forceFactor;
+								uForce[IX(i + 1, j)] += totalVel.X * forceFactor;
 								//vForce[IX(i - 1, j)] += p.Velocity.Y * forceFactor;
+								//Console.Out.WriteLine("X: " + totalVel.X * forceFactor);
 							}
 							if (!lpin)
 							{
-                                uForce[IX(i + 1, j)] += p.RotatedVelocity(dt).X * forceFactor;
+								uForce[IX(i - 1, j)] += totalVel.X * forceFactor;
 								//vForce[IX(i + 1, j)] += p.Velocity.Y * forceFactor;
+								//Console.Out.WriteLine("X: " + totalVel.X * forceFactor);
 
 							}
 							if (!bpin)
 							{
 								//uForce[IX(i, j + 1)] += p.Velocity.X * forceFactor;
-                                vForce[IX(i, j + 1)] += p.RotatedVelocity(dt).Y * forceFactor;
+								vForce[IX(i, j - 1)] += totalVel.Y * forceFactor;
+								//Console.Out.WriteLine("Y: " + totalVel.Y * forceFactor);
 							}
 							if (!apin)
 							{
 								//uForce[IX(i, j - 1)] += p.Velocity.X * forceFactor;
-                                vForce[IX(i, j - 1)] += p.RotatedVelocity(dt).Y * forceFactor;
+								vForce[IX(i, j + 1)] += totalVel.Y * forceFactor;
+								//Console.Out.WriteLine("Y: " + totalVel.Y * forceFactor);
 							}
 
 						}
@@ -508,16 +523,16 @@ namespace Project2
 			AddSource(dt, u, uForce);
 			AddSource(dt, v, vForce);
 
-			Diffuse(visc, dt, 1, helpScalers, u);
-			Diffuse(visc, dt, 2, helpScalers2, v);
-			Swap(ref helpScalers, ref u);
-			Swap(ref helpScalers2, ref v);
-			Project();
-			Advect(1, dt, helpScalers, u, u, v);
-			Advect(2, dt, helpScalers2, v, u, v);
-			Swap(ref helpScalers, ref u);
-			Swap(ref helpScalers2, ref v);
-			Project();
+			//Diffuse(visc, dt, 1, helpScalers, u);
+			//Diffuse(visc, dt, 2, helpScalers2, v);
+			//Swap(ref helpScalers, ref u);
+			//Swap(ref helpScalers2, ref v);
+			//Project();
+			//Advect(1, dt, helpScalers, u, u, v);
+			//Advect(2, dt, helpScalers2, v, u, v);
+			//Swap(ref helpScalers, ref u);
+			//Swap(ref helpScalers2, ref v);
+			//Project();
 		}
 
 		#endregion
