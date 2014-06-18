@@ -224,40 +224,49 @@ namespace Project2
                             {
                                 if (lpin && !rpin)
                                 {
-                                        bIndexu[IX(i, j)].res = resolve.invert;
-                                        bIndexu[IX(i, j)].source = 3;
-                                        bIndexv[IX(i, j)].res = resolve.copy;
-                                        bIndexv[IX(i, j)].source = 3;
-                                        bIndexd[IX(i, j)].res = resolve.copy;
-                                        bIndexd[IX(i, j)].source = 3;
+                                    bIndexu[IX(i, j)].res = resolve.invert;
+                                    bIndexu[IX(i, j)].source = 3;
+                                    bIndexv[IX(i, j)].res = resolve.copy;
+                                    bIndexv[IX(i, j)].source = 3;
+                                    bIndexd[IX(i, j)].res = resolve.copy;
+                                    bIndexd[IX(i, j)].source = 3;
+                                    uForce[IX(i - 1, j)] = p.Velocity.X * 0.5f;
+                                    vForce[IX(i - 1, j)] = p.Velocity.Y * 0.5f;
                                 }
                                 if (rpin && !lpin)
                                 {
-                                        bIndexu[IX(i, j)].res = resolve.invert;
-                                        bIndexu[IX(i, j)].source = 1;
-                                        bIndexv[IX(i, j)].res = resolve.copy;
-                                        bIndexv[IX(i, j)].source = 1;
-                                        bIndexd[IX(i, j)].res = resolve.copy;
-                                        bIndexd[IX(i, j)].source = 1;
+                                    bIndexu[IX(i, j)].res = resolve.invert;
+                                    bIndexu[IX(i, j)].source = 1;
+                                    bIndexv[IX(i, j)].res = resolve.copy;
+                                    bIndexv[IX(i, j)].source = 1;
+                                    bIndexd[IX(i, j)].res = resolve.copy;
+                                    bIndexd[IX(i, j)].source = 1;
+                                    uForce[IX(i + 1, j)] = p.Velocity.X * 0.5f;
+                                    vForce[IX(i + 1, j)] = p.Velocity.Y * 0.5f;
+
                                 }
                                 if (apin && !bpin)
                                 {
-                                        bIndexu[IX(i, j)].res = resolve.copy;
-                                        bIndexu[IX(i, j)].source = 4;
-                                        bIndexv[IX(i, j)].res = resolve.invert;
-                                        bIndexv[IX(i, j)].source = 4;
-                                        bIndexd[IX(i, j)].res = resolve.copy;
-                                        bIndexd[IX(i, j)].source = 4;
+                                    bIndexu[IX(i, j)].res = resolve.copy;
+                                    bIndexu[IX(i, j)].source = 4;
+                                    bIndexv[IX(i, j)].res = resolve.invert;
+                                    bIndexv[IX(i, j)].source = 4;
+                                    bIndexd[IX(i, j)].res = resolve.copy;
+                                    bIndexd[IX(i, j)].source = 4;
+                                    uForce[IX(i, j + 1)] = p.Velocity.X*0.5f;
+                                    vForce[IX(i, j + 1)] = p.Velocity.Y * 0.5f;
                                 }
                                 if (bpin && !apin)
                                 {
-                                        bIndexu[IX(i, j)].res = resolve.copy;
-                                        bIndexu[IX(i, j)].source = 2;
-                                        bIndexv[IX(i, j)].res = resolve.invert;
-                                        bIndexv[IX(i, j)].source = 2;
-                                        bIndexd[IX(i, j)].res = resolve.copy;
-                                        bIndexd[IX(i, j)].source = 2;
-                                }                               
+                                    bIndexu[IX(i, j)].res = resolve.copy;
+                                    bIndexu[IX(i, j)].source = 2;
+                                    bIndexv[IX(i, j)].res = resolve.invert;
+                                    bIndexv[IX(i, j)].source = 2;
+                                    bIndexd[IX(i, j)].res = resolve.copy;
+                                    bIndexd[IX(i, j)].source = 2;
+                                    uForce[IX(i, j - 1)] = p.Velocity.X * 0.5f;
+                                    vForce[IX(i, j - 1)] = p.Velocity.Y * 0.5f;
+                                }                                 
                             }
 
                         }
