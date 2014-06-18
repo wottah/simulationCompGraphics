@@ -217,44 +217,47 @@ namespace Project2
                             if (lpin && rpin && apin && bpin)
                             {
                                 bIndexu[IX(i, j)].res = resolve.zero;
-								bIndexv[IX(i, j)].res = resolve.zero;
-								bIndexd[IX(i, j)].res = resolve.zero;
+                                bIndexv[IX(i, j)].res = resolve.zero;
+                                bIndexd[IX(i, j)].res = resolve.zero;
                             }
-                            if (!lpin && rpin && apin && bpin)
+                            else
                             {
-                                bIndexu[IX(i, j)].res = resolve.invert;
-                                bIndexu[IX(i, j)].source = 1;
-                                bIndexv[IX(i, j)].res = resolve.copy;
-                                bIndexv[IX(i, j)].source = 1;
-                                bIndexd[IX(i, j)].res = resolve.copy;
-                                bIndexd[IX(i, j)].source = 1;
-                            }
-                            if (lpin && !rpin && apin && bpin)
-                            {
-                                bIndexu[IX(i, j)].res = resolve.invert;
-                                bIndexu[IX(i, j)].source = 3;
-                                bIndexv[IX(i, j)].res = resolve.copy;
-                                bIndexv[IX(i, j)].source = 3;
-                                bIndexd[IX(i, j)].res = resolve.copy;
-                                bIndexd[IX(i, j)].source = 3;
-                            }
-                            if (lpin && rpin && !apin && bpin)
-                            {
-                                bIndexu[IX(i, j)].res = resolve.copy;
-                                bIndexu[IX(i, j)].source = 2;
-                                bIndexv[IX(i, j)].res = resolve.invert;
-                                bIndexv[IX(i, j)].source = 2;
-                                bIndexd[IX(i, j)].res = resolve.copy;
-                                bIndexd[IX(i, j)].source = 2;
-                            }
-                            if (lpin && rpin && apin && !bpin)
-                            {
-                                bIndexu[IX(i, j)].res = resolve.copy;
-                                bIndexu[IX(i, j)].source = 4;
-                                bIndexv[IX(i, j)].res = resolve.invert;
-                                bIndexv[IX(i, j)].source = 4;
-                                bIndexd[IX(i, j)].res = resolve.copy;
-                                bIndexd[IX(i, j)].source = 4;
+                                if (lpin && !rpin)
+                                {
+                                        bIndexu[IX(i, j)].res = resolve.invert;
+                                        bIndexu[IX(i, j)].source = 3;
+                                        bIndexv[IX(i, j)].res = resolve.copy;
+                                        bIndexv[IX(i, j)].source = 3;
+                                        bIndexd[IX(i, j)].res = resolve.copy;
+                                        bIndexd[IX(i, j)].source = 3;
+                                }
+                                if (rpin && !lpin)
+                                {
+                                        bIndexu[IX(i, j)].res = resolve.invert;
+                                        bIndexu[IX(i, j)].source = 1;
+                                        bIndexv[IX(i, j)].res = resolve.copy;
+                                        bIndexv[IX(i, j)].source = 1;
+                                        bIndexd[IX(i, j)].res = resolve.copy;
+                                        bIndexd[IX(i, j)].source = 1;
+                                }
+                                if (apin && !bpin)
+                                {
+                                        bIndexu[IX(i, j)].res = resolve.copy;
+                                        bIndexu[IX(i, j)].source = 4;
+                                        bIndexv[IX(i, j)].res = resolve.invert;
+                                        bIndexv[IX(i, j)].source = 4;
+                                        bIndexd[IX(i, j)].res = resolve.copy;
+                                        bIndexd[IX(i, j)].source = 4;
+                                }
+                                if (bpin && !apin)
+                                {
+                                        bIndexu[IX(i, j)].res = resolve.copy;
+                                        bIndexu[IX(i, j)].source = 2;
+                                        bIndexv[IX(i, j)].res = resolve.invert;
+                                        bIndexv[IX(i, j)].source = 2;
+                                        bIndexd[IX(i, j)].res = resolve.copy;
+                                        bIndexd[IX(i, j)].source = 2;
+                                }                               
                             }
 
                         }
