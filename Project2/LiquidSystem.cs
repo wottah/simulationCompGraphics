@@ -309,7 +309,7 @@ namespace Project2
 						bool bpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j - 1), m);
 						if (pin)
 						{
-							float forceFactor = 1.0f;
+							float forceFactor = 10.0f;
 							if (!rpin)
 							{
 								uForce[IX(i - 1, j)] += p.Velocity.X * forceFactor;
@@ -587,7 +587,15 @@ namespace Project2
 
 		public int IX(int x, int y)
 		{
-			return (x) + (N + 2)*(y);
+			while (x < 0)
+			{
+				x += N + 2;
+			}
+			while (y < 0)
+			{
+				y += N + 2;
+			}
+			return (x % (N + 2)) + (N + 2) * (y % (N + 2));
 		}
 
 		private void Swap<T>(ref T[] a, ref T[] b)
