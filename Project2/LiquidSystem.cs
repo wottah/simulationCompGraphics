@@ -274,7 +274,7 @@ namespace Project2
             }
         }
 
-		public void AddForces(Particle p)
+		public void AddForces(Particle p, float dt)
 		{
 			if (p.Polygon.Points.Count > 0)
 			{
@@ -312,24 +312,24 @@ namespace Project2
 							float forceFactor = 10.0f;
 							if (!rpin)
 							{
-								uForce[IX(i - 1, j)] += p.Velocity.X * forceFactor;
+                                uForce[IX(i - 1, j)] += p.RotatedVelocity(dt).X * forceFactor;
 								//vForce[IX(i - 1, j)] += p.Velocity.Y * forceFactor;
 							}
 							if (!lpin)
 							{
-								uForce[IX(i + 1, j)] += p.Velocity.X * forceFactor;
+                                uForce[IX(i + 1, j)] += p.RotatedVelocity(dt).X * forceFactor;
 								//vForce[IX(i + 1, j)] += p.Velocity.Y * forceFactor;
 
 							}
 							if (!bpin)
 							{
 								//uForce[IX(i, j + 1)] += p.Velocity.X * forceFactor;
-								vForce[IX(i, j + 1)] += p.Velocity.Y * forceFactor;
+                                vForce[IX(i, j + 1)] += p.RotatedVelocity(dt).Y * forceFactor;
 							}
 							if (!apin)
 							{
 								//uForce[IX(i, j - 1)] += p.Velocity.X * forceFactor;
-								vForce[IX(i, j - 1)] += p.Velocity.Y * forceFactor;
+                                vForce[IX(i, j - 1)] += p.RotatedVelocity(dt).Y * forceFactor;
 							}
 
 						}
