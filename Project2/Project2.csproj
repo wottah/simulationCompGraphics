@@ -75,6 +75,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extends.cs" />
     <Compile Include="MovingPolygon.cs" />
     <Compile Include="ContinuousField.cs" />
     <None Include="GPULiquidSystem.cs" />

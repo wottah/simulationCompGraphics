@@ -67,6 +67,8 @@ namespace Project2
 
         public void FillBoundryIndexes()
         {
+	        EmptyBoundry();
+
 			SquareBoundryInternal(0, 0, N+2, N+2);
 
 			SquareBoundry(10, 10, 20, 20, false);
@@ -74,6 +76,22 @@ namespace Project2
 			SquareBoundry(30, 40, 10, 10);
 			SquareBoundry(40, 30, 10, 10);
         }
+
+		public void EmptyBoundry()
+		{
+			for (int i = 0; i < N+2; i++)
+			{
+				for (int j = 0; j < N+2; j++)
+				{
+					bIndexu[IX(i, j)].res = resolve.empty;
+					bIndexu[IX(i, j)].source = 0;
+					bIndexv[IX(i, j)].res = resolve.empty;
+					bIndexv[IX(i, j)].source = 0;
+					bIndexd[IX(i, j)].res = resolve.empty;
+					bIndexd[IX(i, j)].source = 0;
+				}
+			}
+		}
 
 		public void SquareBoundryInternal(int x, int y, int w, int h)
 		{
@@ -161,36 +179,46 @@ namespace Project2
 			}
 		}
 
-        public void addBoundries(Particle p)
+        public void AddBoundries(Particle p)
         {
             if (p.Polygon.Points.Count > 0)
             {
-                float minx, maxx, miny, maxy;
-                List<HyperPoint<float>> points = p.Polygon.Points;
-                minx = points.Min(point => point.X);
-                maxx = points.Max(point => point.X);
-                miny = points.Min(point => point.Y);
-                maxy = points.Max(point => point.Y);
-                int iminx = (int)Math.Floor(minx);
-                int imaxx = (int)Math.Ceiling(maxx);
-                int iminy = (int)Math.Floor(miny);
-                int imaxy = (int)Math.Ceiling(maxy);
-                for (int i = iminx; i <= imaxx; i++)
+	            HyperPoint<float> min = new HyperPoint<float>(2), max = new HyperPoint<float>(2);
+				HyperPoint<int> imin = new HyperPoint<int>(2), imax = new HyperPoint<int>(2);
+                
+				List<HyperPoint<float>> points = p.Polygon.Points;
+	            Matrix<float> m = p.WorldMatrix;
+
+				min.X = points.Min(point => point.HGMult(m).X);
+				max.X = points.Max(point => point.HGMult(m).X);
+				min.Y = points.Min(point => point.HGMult(m).Y);
+				max.Y = points.Max(point => point.HGMult(m).Y);
+	            min = min*N;
+	            max = max*N;
+				
+				imin.X = (int)Math.Floor(min.X);
+                imax.X = (int)Math.Ceiling(max.X);
+				imin.Y = (int)Math.Floor(min.Y);
+                imax.Y = (int)Math.Ceiling(max.Y);
+
+				m = Matrix<float>.Resize(new HyperPoint<float>(N, N)) * m;
+
+				for (int i = imin.X; i <= imax.X; i++)
                 {
-                    for (int j = iminy; j <= imaxy; j++)
+					for (int j = imin.Y; j <= imax.Y; j++)
                     {
-                        bool pin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j),p.WorldMatrix);
-                        bool lpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i-1, j),p.WorldMatrix);
-                        bool rpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i+1, j),p.WorldMatrix);
-                        bool apin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j+1),p.WorldMatrix);
-                        bool bpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j-1),p.WorldMatrix);
+	                    bool pin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j), m);
+	                    bool lpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i - 1, j), m);
+	                    bool rpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i + 1, j), m);
+	                    bool apin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j + 1), m);
+	                    bool bpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j - 1), m);
                         if (pin)
                         {
                             if (lpin && rpin && apin && bpin)
                             {
-                                bIndexu[IX(i, j)].res = resolve.empty;
-                                bIndexv[IX(i, j)].res = resolve.empty;
-                                bIndexd[IX(i,j)].res = resolve.empty;
+                                bIndexu[IX(i, j)].res = resolve.zero;
+								bIndexv[IX(i, j)].res = resolve.zero;
+								bIndexd[IX(i, j)].res = resolve.zero;
                             }
                             if (!lpin && rpin && apin && bpin)
                             {
