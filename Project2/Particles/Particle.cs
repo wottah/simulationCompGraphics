@@ -15,7 +15,7 @@ namespace Project2.Particles
 		private HyperPoint<float> _forceConstraint;
 		private int _index;
         private bool _visible;
-		private float _rotation = Convert.ToSingle(Math.PI/4);
+		private float _rotation;
 		private float _angularVelocity;
 		private float _angularForce;
 

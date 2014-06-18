@@ -94,7 +94,11 @@ namespace Project2.Particles
 				{
 					if(p.Polygon.IsInPolygon((contactPoint+adjecentPoint).ConvertTo<float>(), m))
 					{
-						HyperPoint<float> force = new HyperPoint<float>(_uField[contactPoint + adjecentPoint], _vField[contactPoint + adjecentPoint]) * Math.Min(_dField[contactPoint + adjecentPoint], 1.0f);
+						float factor = 0.5f;
+						HyperPoint<float> force =
+							new HyperPoint<float>(_uField[contactPoint + adjecentPoint], _vField[contactPoint + adjecentPoint])*
+							Math.Min(_dField[contactPoint + adjecentPoint], 1.0f);
+						force = force*factor;
 
 						linearForce += force;
 						rotationForce += HyperPoint<float>.Cross2D(contactPoint.ConvertTo<float>() - p.Position, force);

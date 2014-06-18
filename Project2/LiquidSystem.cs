@@ -292,9 +292,9 @@ namespace Project2
 				max = max * N;
 
 				imin.X = (int)Math.Floor(min.X);
-				imax.X = (int)Math.Ceiling(max.X);
+				imax.X = (int)Math.Ceiling(max.X)+1;
 				imin.Y = (int)Math.Floor(min.Y);
-				imax.Y = (int)Math.Ceiling(max.Y);
+				imax.Y = (int)Math.Ceiling(max.Y)+1;
 
 				m = Matrix<float>.Resize(new HyperPoint<float>(N, N)) * m;
 
@@ -302,14 +302,9 @@ namespace Project2
 				{
 					for (int j = imin.Y; j <= imax.Y; j++)
 					{
-						bool pin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j), m);
-						bool lpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i - 1, j), m);
-						bool rpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i + 1, j), m);
-						bool apin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j + 1), m);
-						bool bpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j - 1), m);
-						if (pin)
+						if (bIndexd[IX(i, j)].res != resolve.empty)
 						{
-							float forceFactor = 10.0f;
+							float forceFactor = 0.5f;
 
 							Matrix<float> rotationNextStep = Matrix<float>.Identity(3);
 							m[0, 0] = Convert.ToSingle(Math.Cos(p.AngularVelocity * dt)); m[0, 1] = Convert.ToSingle(-Math.Sin(p.AngularVelocity * dt));
@@ -319,32 +314,27 @@ namespace Project2
 
 							HyperPoint<float> velByRotation = contactPointInPolygonSpace.HGMult(rotationNextStep) - contactPointInPolygonSpace;
 							HyperPoint<float> totalVel = velByRotation + p.Velocity;
-							//HyperPoint<float> totalVel = p.Velocity;
 
-							if (!rpin)
+							if (bIndexd[IX(i + 1, j)].res == resolve.empty)
 							{
 								uForce[IX(i + 1, j)] += totalVel.X * forceFactor;
 								//vForce[IX(i - 1, j)] += p.Velocity.Y * forceFactor;
-								//Console.Out.WriteLine("X: " + totalVel.X * forceFactor);
 							}
-							if (!lpin)
+							if (bIndexd[IX(i - 1, j)].res == resolve.empty)
 							{
 								uForce[IX(i - 1, j)] += totalVel.X * forceFactor;
 								//vForce[IX(i + 1, j)] += p.Velocity.Y * forceFactor;
-								//Console.Out.WriteLine("X: " + totalVel.X * forceFactor);
 
 							}
-							if (!bpin)
+							if (bIndexd[IX(i, j - 1)].res == resolve.empty)
 							{
 								//uForce[IX(i, j + 1)] += p.Velocity.X * forceFactor;
 								vForce[IX(i, j - 1)] += totalVel.Y * forceFactor;
-								//Console.Out.WriteLine("Y: " + totalVel.Y * forceFactor);
 							}
-							if (!apin)
+							if (bIndexd[IX(i, j + 1)].res == resolve.empty)
 							{
 								//uForce[IX(i, j - 1)] += p.Velocity.X * forceFactor;
 								vForce[IX(i, j + 1)] += totalVel.Y * forceFactor;
-								//Console.Out.WriteLine("Y: " + totalVel.Y * forceFactor);
 							}
 
 						}
@@ -523,16 +513,16 @@ namespace Project2
 			AddSource(dt, u, uForce);
 			AddSource(dt, v, vForce);
 
-			//Diffuse(visc, dt, 1, helpScalers, u);
-			//Diffuse(visc, dt, 2, helpScalers2, v);
-			//Swap(ref helpScalers, ref u);
-			//Swap(ref helpScalers2, ref v);
-			//Project();
-			//Advect(1, dt, helpScalers, u, u, v);
-			//Advect(2, dt, helpScalers2, v, u, v);
-			//Swap(ref helpScalers, ref u);
-			//Swap(ref helpScalers2, ref v);
-			//Project();
+			Diffuse(visc, dt, 1, helpScalers, u);
+			Diffuse(visc, dt, 2, helpScalers2, v);
+			Swap(ref helpScalers, ref u);
+			Swap(ref helpScalers2, ref v);
+			Project();
+			Advect(1, dt, helpScalers, u, u, v);
+			Advect(2, dt, helpScalers2, v, u, v);
+			Swap(ref helpScalers, ref u);
+			Swap(ref helpScalers2, ref v);
+			Project();
 		}
 
 		#endregion

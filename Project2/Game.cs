@@ -78,10 +78,10 @@ namespace Project2
 
 			AddParticle(new Particle(new HyperPoint<float>(0.5f, 0.5f), 1, new List<HyperPoint<float>>()
 				                                                               {
-					                                                               new HyperPoint<float>(0.05f, 0.05f),
-																				   new HyperPoint<float>(-0.05f, 0.05f),
-																				   new HyperPoint<float>(-0.05f, -0.05f),
-																				   new HyperPoint<float>(0.05f, -0.05f),
+					                                                               new HyperPoint<float>(0.02f, 0.2f),
+																				   new HyperPoint<float>(-0.02f, 0.2f),
+																				   new HyperPoint<float>(-0.02f, -0.2f),
+																				   new HyperPoint<float>(0.02f, -0.2f),
 				                                                               }));
 
 			_solverEnvironment.Forces.Add(new VelocityFieldForce(particles.ConvertAll(x => x.Index), _uField, _vField, _dField, liqSystem.N + 2));
