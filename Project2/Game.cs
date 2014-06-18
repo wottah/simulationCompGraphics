@@ -21,6 +21,7 @@ namespace Project2
 		private int frame_number;
 
         private Matrix<float> mouseTranslation;
+		private MouseSpringForce mouseForce;
 
 		private string systemName = string.Empty;
 		private List<IDrawable> drawables;
@@ -72,6 +73,9 @@ namespace Project2
 			_vField = new ContinuousField(liqSystem.N+2, liqSystem.N+2);
 			_dField = new ContinuousField(liqSystem.N + 2, liqSystem.N + 2);
 
+			mouseForce = new MouseSpringForce(0, new HyperPoint<float>(1f, 1f), 0.02f, 2f, 1f, false);
+			Add(mouseForce);
+
 			AddParticle(new Particle(new HyperPoint<float>(0.5f, 0.5f), 1, new List<HyperPoint<float>>()
 				                                                               {
 					                                                               new HyperPoint<float>(0.05f, 0.05f),
@@ -82,6 +86,9 @@ namespace Project2
 
 			_solverEnvironment.Forces.Add(new VelocityFieldForce(particles.ConvertAll(x => x.Index), _uField, _vField, _dField, liqSystem.N + 2));
 			_solverEnvironment.Forces.Add(new ViscousDragForce(particles.ConvertAll(x => x.Index), 0.8f));
+			_solverEnvironment.Forces.Add(mouseForce);
+
+			
 
 			mousePointer = new MousePointer();
 			Add(mousePointer);
@@ -222,24 +229,34 @@ namespace Project2
 			if (dsim)
 			{
 				HyperPoint<float> mousePos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
-				
+
+				mouseForce.MousePos = ((HyperPoint<float>)(mouseTranslation * new HyperPoint<float>(Mouse.X, Mouse.Y, 1))).GetLowerDim(2);
+
 				int steps;				
 				steps = Math.Max(1, Convert.ToInt32(Math.Round(1 / dt * SpeedUp / 60.0f)));
 				if (dump_frames)
 					steps = 1;
 				for (int i = 0; i < steps; i++)
 				{
+					//update boundary
 					liqSystem.FillBoundryIndexes();
 					particles.ForEach(liqSystem.AddBoundries);
-					liqSystem.SquareBoundryInternal(0, 0, liqSystem.N + 2, liqSystem.N + 2);
+					liqSystem.FillOuterBoundryCells();
 
-					liqSystem.UI(mousePos, Mouse[MouseButton.Left], Mouse[MouseButton.Right], 5.0f, 100.0f);
+					//update sources
+					liqSystem.ResetSources();
+					if(!mouseForce.IsEnabled)
+						liqSystem.UI(mousePos, Mouse[MouseButton.Left], Mouse[MouseButton.Right], 5.0f, 100.0f);
+					particles.ForEach(liqSystem.AddForces);
+
+					//update liquid system
 					liqSystem.SimulationStep(dt, 0.000f, 0.000f);
 					_uField._data = liqSystem.u;
 					_vField._data = liqSystem.v;
 					_dField._data = liqSystem.densityField;
+
+					//update particle system
 					_solverEnvironment.SimulationStep(particles, dt);
-					//Console.Out.WriteLine(new List<float>(liqSystem.densityField).Sum());
 				}
 			}
 			else
@@ -256,15 +273,24 @@ namespace Project2
 
 		private void OnMouseUp(object sender, MouseButtonEventArgs e)
 		{
-			
+			mouseForce.Disable();
 		}
 
 		private void OnMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			HyperPoint<float> _mousepos =
 				((HyperPoint<float>) (mouseTranslation*new HyperPoint<float>(e.X, e.Y, 1))).GetLowerDim(2);
-			
 
+			float _dist = 0.06f;
+			foreach (Particle _p in particles)
+			{
+				if ((_mousepos - _p.Position).GetLengthSquared() < _dist * _dist)
+				{
+					mouseForce.MousePos = _mousepos;
+					mouseForce.Particle = _p.Index;
+					mouseForce.Enable();
+				}
+			}
 		}
 
 		private void OnMouseMove(object sender, MouseMoveEventArgs e)

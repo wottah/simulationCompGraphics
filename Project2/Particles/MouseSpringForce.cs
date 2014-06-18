@@ -23,6 +23,11 @@ namespace Project2.Particles
             _isEnabled = isEnabled;
 		}
 
+	    public bool IsEnabled
+	    {
+		    get { return _isEnabled; }
+	    }
+
         public int Particle
         {
             get { return _p1; }

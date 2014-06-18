@@ -69,12 +69,12 @@ namespace Project2
         {
 	        EmptyBoundry();
 
-			SquareBoundryInternal(0, 0, N+2, N+2);
+	        FillOuterBoundryCells();
 
-			SquareBoundry(10, 10, 20, 20, false);
-			SquareBoundryInternal(11, 11, 18, 18);
-			SquareBoundry(30, 40, 10, 10);
-			SquareBoundry(40, 30, 10, 10);
+	        //SquareBoundry(10, 10, 20, 20, false);
+	        //SquareBoundryInternal(11, 11, 18, 18);
+	        //SquareBoundry(30, 40, 10, 10);
+	        //SquareBoundry(40, 30, 10, 10);
         }
 
 		public void EmptyBoundry()
@@ -91,6 +91,11 @@ namespace Project2
 					bIndexd[IX(i, j)].source = 0;
 				}
 			}
+		}
+
+		public void FillOuterBoundryCells()
+		{
+			SquareBoundryInternal(0, 0, N + 2, N + 2);
 		}
 
 		public void SquareBoundryInternal(int x, int y, int w, int h)
@@ -230,8 +235,6 @@ namespace Project2
                                     bIndexv[IX(i, j)].source = 3;
                                     bIndexd[IX(i, j)].res = resolve.copy;
                                     bIndexd[IX(i, j)].source = 3;
-                                    uForce[IX(i - 1, j)] = p.Velocity.X * 0.5f;
-                                    vForce[IX(i - 1, j)] = p.Velocity.Y * 0.5f;
                                 }
                                 if (rpin && !lpin)
                                 {
@@ -241,8 +244,6 @@ namespace Project2
                                     bIndexv[IX(i, j)].source = 1;
                                     bIndexd[IX(i, j)].res = resolve.copy;
                                     bIndexd[IX(i, j)].source = 1;
-                                    uForce[IX(i + 1, j)] = p.Velocity.X * 0.5f;
-                                    vForce[IX(i + 1, j)] = p.Velocity.Y * 0.5f;
 
                                 }
                                 if (apin && !bpin)
@@ -253,8 +254,6 @@ namespace Project2
                                     bIndexv[IX(i, j)].source = 4;
                                     bIndexd[IX(i, j)].res = resolve.copy;
                                     bIndexd[IX(i, j)].source = 4;
-                                    uForce[IX(i, j + 1)] = p.Velocity.X*0.5f;
-                                    vForce[IX(i, j + 1)] = p.Velocity.Y * 0.5f;
                                 }
                                 if (bpin && !apin)
                                 {
@@ -264,8 +263,6 @@ namespace Project2
                                     bIndexv[IX(i, j)].source = 2;
                                     bIndexd[IX(i, j)].res = resolve.copy;
                                     bIndexd[IX(i, j)].source = 2;
-                                    uForce[IX(i, j - 1)] = p.Velocity.X * 0.5f;
-                                    vForce[IX(i, j - 1)] = p.Velocity.Y * 0.5f;
                                 }                                 
                             }
 
@@ -276,6 +273,72 @@ namespace Project2
 
             }
         }
+
+		public void AddForces(Particle p)
+		{
+			if (p.Polygon.Points.Count > 0)
+			{
+				HyperPoint<float> min = new HyperPoint<float>(2), max = new HyperPoint<float>(2);
+				HyperPoint<int> imin = new HyperPoint<int>(2), imax = new HyperPoint<int>(2);
+
+				List<HyperPoint<float>> points = p.Polygon.Points;
+				Matrix<float> m = p.WorldMatrix;
+
+				min.X = points.Min(point => point.HGMult(m).X);
+				max.X = points.Max(point => point.HGMult(m).X);
+				min.Y = points.Min(point => point.HGMult(m).Y);
+				max.Y = points.Max(point => point.HGMult(m).Y);
+				min = min * N;
+				max = max * N;
+
+				imin.X = (int)Math.Floor(min.X);
+				imax.X = (int)Math.Ceiling(max.X);
+				imin.Y = (int)Math.Floor(min.Y);
+				imax.Y = (int)Math.Ceiling(max.Y);
+
+				m = Matrix<float>.Resize(new HyperPoint<float>(N, N)) * m;
+
+				for (int i = imin.X; i <= imax.X; i++)
+				{
+					for (int j = imin.Y; j <= imax.Y; j++)
+					{
+						bool pin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j), m);
+						bool lpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i - 1, j), m);
+						bool rpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i + 1, j), m);
+						bool apin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j + 1), m);
+						bool bpin = p.Polygon.IsInPolygon(new HyperPoint<float>(i, j - 1), m);
+						if (pin)
+						{
+							float forceFactor = 1.0f;
+							if (!rpin)
+							{
+								uForce[IX(i - 1, j)] += p.Velocity.X * forceFactor;
+								//vForce[IX(i - 1, j)] += p.Velocity.Y * forceFactor;
+							}
+							if (!lpin)
+							{
+								uForce[IX(i + 1, j)] += p.Velocity.X * forceFactor;
+								//vForce[IX(i + 1, j)] += p.Velocity.Y * forceFactor;
+
+							}
+							if (!bpin)
+							{
+								//uForce[IX(i, j + 1)] += p.Velocity.X * forceFactor;
+								vForce[IX(i, j + 1)] += p.Velocity.Y * forceFactor;
+							}
+							if (!apin)
+							{
+								//uForce[IX(i, j - 1)] += p.Velocity.X * forceFactor;
+								vForce[IX(i, j - 1)] += p.Velocity.Y * forceFactor;
+							}
+
+						}
+					}
+				}
+
+
+			}
+		}
 		
         public void AllocateData()
 		{
@@ -296,7 +359,7 @@ namespace Project2
 			ClearData();
 		}
 
-		public void UI(HyperPoint<float> position, bool left, bool right, float force, float source)
+		public void ResetSources()
 		{
 			int i, j, size = (N + 2) * (N + 2);
 
@@ -304,6 +367,11 @@ namespace Project2
 			{
 				uForce[i] = vForce[i] = sources[i] = 0.0f;
 			}
+		}
+
+		public void UI(HyperPoint<float> position, bool left, bool right, float force, float source)
+		{
+			int i, j;
 
 			if (!left && !right) return;
 			
