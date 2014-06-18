@@ -49,17 +49,12 @@ namespace Project2
         {
 			if (_points != null && _points.Count > 0)
             {
-                GL.Begin(PrimitiveType.Lines);
+                GL.Begin(PrimitiveType.LineLoop);
                 for (int i = 0; i < _points.Count; i++)
                 {
-	                HyperPoint<float> p1 = _points[i];
-					HyperPoint<float> p2 = _points[(i + 1) % _points.Count];
-
-	                p1 = ConvertToPolygonSpace(p1, m);
-					p2 = ConvertToPolygonSpace(p2, m);
-
-					GLMath2.Vertex2(p1);
-					GLMath2.Vertex2(p2);
+	                HyperPoint<float> p = _points[i];
+	                p = ConvertToPolygonSpace(p, m);
+					GLMath2.Vertex2(p);
                 }
                 GL.End();
             }
