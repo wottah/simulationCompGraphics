@@ -247,7 +247,7 @@ namespace Project2
 					liqSystem.ResetSources();
 					if(!mouseForce.IsEnabled)
 						liqSystem.UI(mousePos, Mouse[MouseButton.Left], Mouse[MouseButton.Right], 5.0f, 100.0f);
-					particles.ForEach(liqSystem.AddForces);
+					particles.ForEach(x => liqSystem.AddForces(x, dt));
 
 					//update liquid system
 					liqSystem.SimulationStep(dt, 0.000f, 0.000f);
