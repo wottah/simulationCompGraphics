@@ -17,6 +17,13 @@ namespace Project2.Particles
         private bool _visible;
 		private float _rotation = Convert.ToSingle(Math.PI/4);
 		private float _angularVelocity = Convert.ToSingle(Math.PI/4/100);
+        private Matrix<float> _worldMatrix;
+
+        public Matrix<float> WorldMatrix
+        {
+            get { return _worldMatrix; }
+            set { _worldMatrix = value; }
+        }
 
 		public bool Visible
         {

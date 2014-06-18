@@ -19,6 +19,12 @@ namespace Project2
             _points = points;
         }
 
+        public List<HyperPoint<float>> Points
+        {
+            get { return _points; }
+        }
+
+
         //Tests whether point p is in polygon. ref: http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html 
         public bool IsInPolygon(HyperPoint<float> p, Matrix<float> m)
         {
