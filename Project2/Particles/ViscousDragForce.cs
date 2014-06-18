@@ -21,6 +21,10 @@ namespace Project2.Particles
 		public void CalculateForce(List<Particle> particles)
 		{
 			_particles.ForEach(x => particles[x].ForceAccumulator -= _drag * particles[x].Velocity);
+			_particles.ForEach(x =>
+				                   {
+					                   particles[x].AngularForce -= _drag*particles[x].AngularVelocity;
+				                   });
 		}
 
 		#endregion

@@ -78,9 +78,11 @@ namespace Project2.Particles
 		public void Execute(List<Particle> particles, float dt)
 		{
 			particles.ForEach(x => x.ForceAccumulator = new HyperPoint<float>(0f, 0f));
+			particles.ForEach(x => x.AngularForce = 0f);
 			Forces.ForEach(x => x.CalculateForce(particles));
 			DoConstraints(Constraints, particles, dt, SpringConstant, SpringDemping);
 			particles.ForEach(x => x.Velocity += (x.ForceAccumulator + x.ForceConstraint) / x.Massa * dt);
+			particles.ForEach(x => x.AngularVelocity += x.AngularForce * dt);
 		}
 
 		private void DoConstraints(List<IConstraint> constraints, List<Particle> particles, float dt, float ks, float kd)

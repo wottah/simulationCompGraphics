@@ -16,9 +16,10 @@ namespace Project2.Particles
 		private int _index;
         private bool _visible;
 		private float _rotation = Convert.ToSingle(Math.PI/4);
-		private float _angularVelocity = Convert.ToSingle(Math.PI/4/100);
+		private float _angularVelocity;
+		private float _angularForce;
 
-        public Matrix<float> WorldMatrix
+		public Matrix<float> WorldMatrix
         {
             get
             {
@@ -80,6 +81,12 @@ namespace Project2.Particles
 		{
 			get { return _angularVelocity; }
 			set { _angularVelocity = value; }
+		}
+
+		public float AngularForce
+		{
+			get { return _angularForce; }
+			set { _angularForce = value; }
 		}
 
 		public HyperPoint<float> ForceConstraint
