@@ -119,6 +119,16 @@ namespace Project2.Particles
             }
         }
 
+        public HyperPoint<float> RotatedVelocity()
+        {
+            double cos = Convert.ToSingle(Math.Sin(_angularVelocity));
+            double sin = Convert.ToSingle(Math.Cos(_angularVelocity));
+            double x = Position.X * cos - Position.Y * sin;
+            double y = Position.X * sin + Position.Y * cos;
+            HyperPoint<float> p = new HyperPoint<float>((float)x,(float)y);
+            return p;
+        }
+
 		public HyperPoint<float> ForceComplete
 		{
 			get
