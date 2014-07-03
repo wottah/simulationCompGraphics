@@ -1,1 +1,15 @@
-\chapter{Rigid Bodies} %Both ways 
+\chapter{Rigid Bodies}
+Rigid body's are defined by a particle that is the center of mass and a polygon. The weight distribution is equal in the complete rigid body.
+
+To find points where forces has to be applied, a discrete version of the rigid body has to be found. This is simple done by walking over the bounding box and checking if the cell at that position is in the polygon. Let $P$ the position that is checked.
+
+It is also interesting to know to which points it is connected. This is done by checking the horizontal neighbours and vertical neighbours. Let this be $A_{P,1} .. A_{P,4}$. With this information all the boundary cells can be detected of a rigid object.
+
+\section{Boundaries}
+With the information found it is easy to create boundaries for the liquid. For every adjacent cell the correct copy methods are determined. When 
+
+\section{Body's to fluid}
+Forces that are exerted on $A_{P,1} .. A_{P,4}$ (if they are liquid) is based on the velocity of cell $P$ in the object. The velocity  and the angular velocity of the object are both used to calculate the velocity of point $P$. This velocity is multiplied with a constant, before applying it to the fluid.
+
+\section{Fluid to Body's}
+The force on point $P$ is calculated by the velocity in the adjacent cells $A_{P,1} .. A_{P,4}$ if there is liquid. The velocity is multiplied with it's density at that point and a constant. The force on point $P$ is then transformed to linear force and rotation force on the object. 
