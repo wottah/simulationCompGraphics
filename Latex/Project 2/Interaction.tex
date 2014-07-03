@@ -1,0 +1,25 @@
+\chapter{Interaction}
+There are several types of user interaction within the simulation which can be put in two categories; interaction that directly influences the simulation (adds forces) and interaction that influences the simulation settings (change timestep, scene, etc.). \\
+
+\smallskip
+The interaction that directly influences the simulation itself is the mouse interaction. When clicking and dragging on a particle (or its proximity) a spring force will be applied between the current mouse position and the particle. This makes it possible for the user to grab and drag particles (and thus rigidbodies) around in the simulation. The mouse position is updated in every time step. The mouse buttons can also be used to add a force to the simulation as well was adding fluid to the system. \\
+
+\smallskip
+The keyboard commands that influence the settings of the simulation as well as the scenes are as follows: \\
+\begin{itemize}
+  \item \textbf{C}: Resets the current scene.
+  \item \textbf{D}: Starts/Stops capturing frames.
+  \item \textbf{Q}: Exit application.
+  \item \textbf{space}: Pause simulation.
+  \item \textbf{Up}: Doubles timestep $(dt=dt*2)$.
+  \item \textbf{Down}: Halves timestep $(dt = dt/2)$.
+  \item \textbf{Left}: halves number of steps skipped. \\
+  (increases simulation computational effort)
+  \item \textbf{Right}: doubles number of steps skipped. \\
+  (decreases computational effort)
+  \item \textbf{1}: Switch to basic view.
+  \item \textbf{2}: Switch to view that shows the velocity field.
+  \item \textbf{3}: Switch to view that shows both velocity and density field.
+\end{itemize}
+
+
