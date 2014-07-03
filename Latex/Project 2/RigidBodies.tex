@@ -6,10 +6,24 @@ To find points where forces has to be applied, a discrete version of the rigid b
 It is also interesting to know to which points it is connected. This is done by checking the horizontal neighbours and vertical neighbours. Let this be $A_{P,1} .. A_{P,4}$. With this information all the boundary cells can be detected of a rigid object.
 
 \section{Boundaries}
-With the information found it is easy to create boundaries for the liquid. For every adjacent cell the correct copy methods are determined. When 
+With the information found it is easy to create boundaries for the liquid. For every adjacent cell the correct copy methods are determined. When
 
 \section{Body's to fluid}
-Forces that are exerted on $A_{P,1} .. A_{P,4}$ (if they are liquid) is based on the velocity of cell $P$ in the object. The velocity  and the angular velocity of the object are both used to calculate the velocity of point $P$. This velocity is multiplied with a constant, before applying it to the fluid.
+Forces that are exerted on $A_{P,1} .. A_{P,4}$ (if they are liquid) is based on the velocity of cell $P$ in the object. The velocity  and the angular velocity of the object are both used to calculate the velocity of point $P$. This velocity is multiplied with a constant, before applying it to the fluid. In figure \ref{fig:BodyToFluid} there is a scene where forces are applied from the body to the fluid.
+
+\begin{figure}[htb!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/BodyToFluid}
+    \caption{A scene where forces from the body are applied to the fluid}
+    \label{fig:BodyToFluid}
+\end{figure}
 
 \section{Fluid to Body's}
-The force on point $P$ is calculated by the velocity in the adjacent cells $A_{P,1} .. A_{P,4}$ if there is liquid. The velocity is multiplied with it's density at that point and a constant. The force on point $P$ is then transformed to linear force and rotation force on the object. 
+The force on point $P$ is calculated by the velocity in the adjacent cells $A_{P,1} .. A_{P,4}$ if there is liquid. The velocity is multiplied with it's density at that point and a constant. The force on point $P$ is then transformed to linear force and rotation force on the object. In figure \ref{fig:FluidToBody} there is a scene where forces are applied from the fluid to the body.
+
+\begin{figure}[htb!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/FluidToBody}
+    \caption{A scene where forces from the fluid are applied to the body}
+    \label{fig:FluidToBody}
+\end{figure}
