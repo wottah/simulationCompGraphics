@@ -1,0 +1,49 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage{graphicx,color}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{iftex}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\ifPDFTeX
+    \usepackage[utf8]{inputenc}
+\fi
+
+\IfFileExists{tuereport2008.sty}{\usepackage[english]{tuereport2008}}{}
+
+\lstset{language=[Sharp]C, breaklines=true}
+
+\IfFileExists{tuereport2008.sty}
+{
+    \title{Simulation in computer graphics}
+    \subtitle{Project 2}
+    \author{Michiel Fortuin\\Wouter Boereboom}
+    \version{1.0}
+    \administrativeunit{Department of Mathematics and Computer Science}   % insert department name here
+    \department{Visualization}     % subdepartment, or group
+}{
+    \title{Simulation in computer graphics: project 1}
+    \author{Michiel Fortuin\\Wouter Boereboom}
+}
+%\orderissuer{}
+%\copyholder{}
+%\website{}
+%\reference{}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\input{Introduction}
+\input{Overview}
+\input{BasicFluidsimulation}
+\input{BoundariesAndFixedobjects}
+\input{MovingSolidObjects}
+\input{RigidBodies}
+\input{Particles}
+\input{Conclusions}
+
+\end{document}
